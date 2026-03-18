@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: specialpassword!
+    volumes:
+      - postgres_biteful:/var/lib/postgresql/data
+
+volumes:
+  postgres_biteful:
