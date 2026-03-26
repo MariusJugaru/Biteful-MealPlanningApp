@@ -3,6 +3,8 @@ package com.biteful.mealplanner.userservice.services;
 import com.biteful.mealplanner.userservice.domain.dto.LoginRequestDto;
 import com.biteful.mealplanner.userservice.domain.dto.UpdatePasswordRequestDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +28,8 @@ public interface UserService {
     UserEntity updateUserPassword(UUID id, UpdatePasswordRequestDto request);
 
     // Returns all users
-    List<UserEntity> getAllUsers();
+    Page<UserEntity> getAllUsers(Pageable pageable);
 
     // Deletes a user by ID
     void deleteUser(UUID id);
-
-    String loginUser(LoginRequestDto loginRequestDto);
 }

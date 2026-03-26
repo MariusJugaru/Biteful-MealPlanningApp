@@ -13,7 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class AdminUsersDto {
+    private UUID id;
+
     private String username;
 
     private String email;

@@ -25,6 +25,7 @@ public class JwtServiceImpl implements JwtService {
         this.expirationMs = expirationMs;
     }
 
+
     @Override
     public String generateToken(UserEntity userEntity) {
         return Jwts.builder()

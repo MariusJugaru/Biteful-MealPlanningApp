@@ -1,17 +1,17 @@
 package com.biteful.mealplanner.userservice.mappers.impl;
 
+import com.biteful.mealplanner.userservice.domain.dto.AdminUsersDto;
 import com.biteful.mealplanner.userservice.domain.dto.UserDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
 import com.biteful.mealplanner.userservice.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
-public class UserMapper implements Mapper<UserEntity, UserDto> {
+public class AdminUserMapper implements Mapper<UserEntity, AdminUsersDto> {
     @Override
-    public UserDto mapTo(UserEntity userEntity) {
-        return UserDto.builder()
+    public AdminUsersDto mapTo(UserEntity userEntity) {
+        return AdminUsersDto.builder()
+                .id(userEntity.getId())
                 .username(userEntity.getUsername())
                 .email(userEntity.getEmail())
                 .userRole(userEntity.getUserRole())
@@ -20,7 +20,7 @@ public class UserMapper implements Mapper<UserEntity, UserDto> {
     }
 
     @Override
-    public UserEntity mapFrom(UserDto userDto) {
+    public UserEntity mapFrom(AdminUsersDto AdminUsersDto) {
         throw new UnsupportedOperationException("Mapping from UserDto not supported");
     }
 }

@@ -5,6 +5,8 @@ import com.biteful.mealplanner.userservice.domain.dto.UpdatePasswordRequestDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
 import com.biteful.mealplanner.userservice.repositories.UserRepository;
 import com.biteful.mealplanner.userservice.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +18,11 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtServiceImpl jwtService;
 
     // CRUD logic
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtServiceImpl jwtService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
     }
 
     @Override
@@ -59,8 +59,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
-        return (List<UserEntity>) userRepository.findAll();
+    public Page<UserEntity> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
@@ -68,23 +68,5 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    // Business logic
-    @Override
-    public String loginUser(LoginRequestDto loginRequestDto) {
-        String usernameOrEmail = loginRequestDto.getUsernameOrEmail();
-        Optional<UserEntity> user = userRepository.findByUsername(usernameOrEmail);
-
-        if (user.isEmpty()) {
-            user = userRepository.findByEmail(usernameOrEmail);
-        }
-
-        if (user.isEmpty())
-            throw new RuntimeException("The credentials don't match any user");
-
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.get().getPasswordHash()))
-            throw new RuntimeException("The credentials don't match any user");
-
-        return jwtService.generateToken(user.get());
-    }
 
 }
