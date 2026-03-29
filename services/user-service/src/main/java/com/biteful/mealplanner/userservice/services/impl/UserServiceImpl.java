@@ -1,8 +1,10 @@
 package com.biteful.mealplanner.userservice.services.impl;
 
-import com.biteful.mealplanner.userservice.domain.dto.LoginRequestDto;
 import com.biteful.mealplanner.userservice.domain.dto.UpdatePasswordRequestDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
+import com.biteful.mealplanner.userservice.exceptions.runtime.EmailAlreadyExistsException;
+import com.biteful.mealplanner.userservice.exceptions.runtime.InvalidPasswordException;
+import com.biteful.mealplanner.userservice.exceptions.runtime.UserNotFoundException;
 import com.biteful.mealplanner.userservice.repositories.UserRepository;
 import com.biteful.mealplanner.userservice.services.UserService;
 import org.springframework.data.domain.Page;
@@ -27,35 +29,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity createUser(UserEntity userEntity) {
+        if (userRepository.findByEmail(userEntity.getEmail()).isPresent())
+            throw new EmailAlreadyExistsException();
+        userEntity.setPasswordHash(passwordEncoder.encode(userEntity.getPasswordHash()));
         return userRepository.save(userEntity);
     }
 
     @Override
-    public Optional<UserEntity> getUserByID(UUID id) {
-        return userRepository.findById(id);
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 
     @Override
-    public Optional<UserEntity> getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserEntity getUserByID(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
-    public Optional<UserEntity> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public UserEntity getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public UserEntity getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
     public UserEntity updateUserPassword(UUID id, UpdatePasswordRequestDto request) {
-        Optional<UserEntity> user = getUserByID(id);
-        if (user.isEmpty()) throw new RuntimeException("User not found");
+        UserEntity user = getUserByID(id);
 
-        if (!passwordEncoder.matches(request.getOldPassword(), user.get().getPasswordHash())) {
-            throw new RuntimeException("Old password is incorrect");
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+            throw new InvalidPasswordException();
         }
 
-        user.get().setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        return userRepository.save(user.get());
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        return userRepository.save(user);
     }
 
     @Override

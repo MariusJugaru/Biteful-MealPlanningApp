@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserCreateMapper implements Mapper<UserEntity, UserCreateRequestDto> {
-    private final PasswordEncoder passwordEncoder;
-
-    public UserCreateMapper(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public UserCreateRequestDto mapTo(UserEntity userEntity) {
@@ -28,7 +23,7 @@ public class UserCreateMapper implements Mapper<UserEntity, UserCreateRequestDto
         return UserEntity.builder()
                 .username(userCreateRequestDto.getUsername())
                 .email(userCreateRequestDto.getEmail())
-                .passwordHash(passwordEncoder.encode(userCreateRequestDto.getPassword()))
+                .passwordHash(userCreateRequestDto.getPassword())
                 .userRole(UserRole.USER)
                 .build();
     }

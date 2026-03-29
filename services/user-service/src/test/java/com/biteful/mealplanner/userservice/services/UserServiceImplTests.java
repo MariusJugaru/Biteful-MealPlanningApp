@@ -28,23 +28,21 @@ public class UserServiceImplTests {
 
     private final UserService underTest;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
 
     @Autowired
-    public UserServiceImplTests(UserService underTest, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserServiceImplTests(UserService underTest, PasswordEncoder passwordEncoder) {
         this.underTest = underTest;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
     }
 
     @Test
     public void testThatUserCanBeCreatedAndRecalledById() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
-        Optional<UserEntity> result = underTest.getUserByID(userSavedEntityA.getId());
-        assertThat(result).isPresent();
-        assertThat(result.get())
+        UserEntity result = underTest.getUserByID(userSavedEntityA.getId());
+        assertThat(result).isNotNull();
+        assertThat(result)
                 .usingRecursiveComparison()
                 .ignoringFields("createdAt")
                 .isEqualTo(userSavedEntityA);
@@ -52,12 +50,12 @@ public class UserServiceImplTests {
 
     @Test
     public void testThatUserCanBeCreatedAndRecalledByUsername() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
-        Optional<UserEntity> result = underTest.getUserByUsername(userSavedEntityA.getUsername());
-        assertThat(result).isPresent();
-        assertThat(result.get())
+        UserEntity result = underTest.getUserByUsername(userSavedEntityA.getUsername());
+        assertThat(result).isNotNull();
+        assertThat(result)
                 .usingRecursiveComparison()
                 .ignoringFields("createdAt")
                 .isEqualTo(userSavedEntityA);
@@ -65,12 +63,12 @@ public class UserServiceImplTests {
 
     @Test
     public void testThatUserCanBeCreatedAndRecalledByEmail() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
-        Optional<UserEntity> result = underTest.getUserByEmail(userSavedEntityA.getEmail());
-        assertThat(result).isPresent();
-        assertThat(result.get())
+        UserEntity result = underTest.getUserByEmail(userSavedEntityA.getEmail());
+        assertThat(result).isNotNull();
+        assertThat(result)
                 .usingRecursiveComparison()
                 .ignoringFields("createdAt")
                 .isEqualTo(userSavedEntityA);
@@ -78,10 +76,10 @@ public class UserServiceImplTests {
 
     @Test
     public void testThatMultipleUsersCanBeCreatedAndRecalled() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
-        UserEntity userEntityB = TestDataUtil.createUserEnityB(passwordEncoder);
+        UserEntity userEntityB = TestDataUtil.createUserEnityB();
         UserEntity userSavedEntityB = underTest.createUser(userEntityB);
 
         Pageable pageable = PageRequest.of(0, 10);
@@ -93,7 +91,7 @@ public class UserServiceImplTests {
 
     @Test
     public void testThatUserCanChangePassword() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
         UpdatePasswordRequestDto updatePasswordRequestDto = UpdatePasswordRequestDto.builder()
@@ -108,7 +106,7 @@ public class UserServiceImplTests {
 
     @Test
     public void testThatThrowsExceptionWhenOldPasswordIsWrong() {
-        UserEntity userEntityA = TestDataUtil.createUserEnityA(passwordEncoder);
+        UserEntity userEntityA = TestDataUtil.createUserEnityA();
         UserEntity userSavedEntityA = underTest.createUser(userEntityA);
 
         UpdatePasswordRequestDto updatePasswordRequestDto = UpdatePasswordRequestDto.builder()

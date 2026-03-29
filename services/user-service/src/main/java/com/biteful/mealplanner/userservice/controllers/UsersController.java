@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,12 +41,9 @@ public class UsersController {
     public UserDto getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
         UUID userId = principal.getId();
 
-        Optional<UserEntity> user = userService.getUserByID(userId);
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
-        }
+        UserEntity user = userService.getUserByID(userId);
 
-        return userMapper.mapTo(user.get());
+        return userMapper.mapTo(user);
     }
 
     @GetMapping("/api/users")
@@ -59,5 +57,13 @@ public class UsersController {
          Page<UserEntity> usersPage = userService.getAllUsers(pageable);
 
         return usersPage.map(adminUserMapper::mapTo);
+    }
+
+    @GetMapping("/api/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public AdminUsersDto getUser(@PathVariable UUID id) {
+        UserEntity userEntity = userService.getUserByID(id);
+
+        return adminUserMapper.mapTo(userEntity);
     }
 }

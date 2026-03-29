@@ -8,6 +8,8 @@ import com.biteful.mealplanner.userservice.mappers.Mapper;
 import com.biteful.mealplanner.userservice.services.AuthService;
 import com.biteful.mealplanner.userservice.services.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,10 +34,12 @@ public class AuthController {
     }
 
     @PostMapping(path = "/api/register")
-    public UserCreateRequestDto register(@RequestBody @Valid UserCreateRequestDto userCreateRequestDto) {
+    public ResponseEntity<LoginResponseDto> register(@RequestBody @Valid UserCreateRequestDto userCreateRequestDto) {
         UserEntity userEntity = createMapper.mapFrom(userCreateRequestDto);
         UserEntity savedUserEntity = userService.createUser(userEntity);
 
-        return createMapper.mapTo(savedUserEntity);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(authService.generateTokenForUser(savedUserEntity));
     }
 }

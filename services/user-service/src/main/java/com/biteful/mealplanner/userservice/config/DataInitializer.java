@@ -23,11 +23,11 @@ public class DataInitializer {
                                        @Value("${app.admin.email}") String adminEmail) {
         return args -> {
 
-            if (userService.getUserByUsername(adminUsername).isEmpty()) {
+            if (!userService.existsByUsername(adminUsername)) {
                 UserEntity admin = UserEntity.builder()
                         .username(adminUsername)
                         .email(adminEmail)
-                        .passwordHash(passwordEncoder.encode(adminPassword))
+                        .passwordHash(adminPassword)
                         .userRole(UserRole.ADMIN)
                         .build();
 

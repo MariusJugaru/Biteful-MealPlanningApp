@@ -15,14 +15,17 @@ public interface UserService {
     // Creates a user
     UserEntity createUser(UserEntity userEntity);
 
+    // Checks if user exists by username
+    public boolean existsByUsername(String username);
+
     // Returns a user by ID
-    Optional<UserEntity> getUserByID(UUID id);
+    UserEntity getUserByID(UUID id);
 
     // Returns a user by username
-    Optional<UserEntity> getUserByUsername(String username);
+    UserEntity getUserByUsername(String username);
 
     // Returns a user by email
-    Optional<UserEntity> getUserByEmail(String email);
+    UserEntity getUserByEmail(String email);
 
     // Updates a user's password
     UserEntity updateUserPassword(UUID id, UpdatePasswordRequestDto request);

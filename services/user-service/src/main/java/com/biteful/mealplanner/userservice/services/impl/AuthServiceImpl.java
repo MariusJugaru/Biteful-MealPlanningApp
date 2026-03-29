@@ -3,6 +3,7 @@ package com.biteful.mealplanner.userservice.services.impl;
 import com.biteful.mealplanner.userservice.domain.dto.LoginRequestDto;
 import com.biteful.mealplanner.userservice.domain.dto.LoginResponseDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
+import com.biteful.mealplanner.userservice.exceptions.runtime.InvalidCredentialsException;
 import com.biteful.mealplanner.userservice.repositories.UserRepository;
 import com.biteful.mealplanner.userservice.services.AuthService;
 import com.biteful.mealplanner.userservice.services.JwtService;
@@ -35,10 +36,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (user.isEmpty())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
+            throw new InvalidCredentialsException();
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.get().getPasswordHash()))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
+            throw new InvalidCredentialsException();
 
         String token = jwtService.generateToken(user.get());
 
@@ -46,6 +47,17 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .username(user.get().getUsername())
                 .role(user.get().getUserRole().name())
+                .build();
+    }
+
+    @Override
+    public LoginResponseDto generateTokenForUser(UserEntity userEntity) {
+        String token = jwtService.generateToken(userEntity);
+
+        return LoginResponseDto.builder()
+                .token(token)
+                .username(userEntity.getUsername())
+                .role(userEntity.getUserRole().name())
                 .build();
     }
 }
