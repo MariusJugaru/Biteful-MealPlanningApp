@@ -1,19 +1,26 @@
 package com.biteful.mealplanner.recipeservice.services;
 
+import com.biteful.mealplanner.recipeservice.config.security.UserPrincipal;
 import com.biteful.mealplanner.recipeservice.domain.documents.Recipe;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RecipeService {
 
-    public Recipe createRecipe(Recipe recipe);
+    public Recipe createRecipe(Recipe recipe, UUID userId, String role);
 
     public Recipe getRecipeById(String id);
 
-    public List<Recipe> getRecipesByUser(UUID userId);
+    public Page<Recipe> getRecipesByUser(UUID userId, Pageable pageable);
 
-    public List<Recipe> getAllRecipes();
+    Recipe getByIdAndUserId(String recipeId, UUID userId);
+
+    Recipe getRecipeWithAccess(String recipeId, UserPrincipal userPrincipal);
+
+    public Page<Recipe> getAllRecipes(Pageable pageable);
 
     public Recipe updateRecipe(String id, Recipe updatedRecipe);
 
