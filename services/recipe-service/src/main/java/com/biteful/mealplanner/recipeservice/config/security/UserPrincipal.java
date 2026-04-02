@@ -1,12 +1,14 @@
 package com.biteful.mealplanner.recipeservice.config.security;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class UserPrincipal {
     private final UUID id;
 

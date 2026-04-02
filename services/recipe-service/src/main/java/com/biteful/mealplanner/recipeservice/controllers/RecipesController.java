@@ -50,6 +50,21 @@ public class RecipesController {
                 .body(response);
     }
 
+    // Returns all the recipes in the database, paginated.
+    @GetMapping
+    @PreAuthorize(("hasRole('ADMIN')"))
+    public Page<RecipeSummaryDto> getAllRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Recipe> recipes = recipeService.getAllRecipes(pageable);
+
+        return recipes.map(mapperFacade::mapToSummary);
+    }
+
+
+    // Returns all the recipes created by the authenticated user, paginated.
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public Page<RecipeSummaryDto> getMyRecipes(
@@ -63,6 +78,7 @@ public class RecipesController {
         return recipes.map(mapperFacade::mapToSummary);
     }
 
+    // Returns a specific recipe created by the authenticated user.
     @GetMapping("/me/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public RecipeDto getMyRecipe(
@@ -74,6 +90,7 @@ public class RecipesController {
     }
 
 
+    // Returns a specific recipe.
     @GetMapping("/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public RecipeDto getByIdAdmin(
