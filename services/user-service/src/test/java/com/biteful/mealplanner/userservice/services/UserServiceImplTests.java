@@ -118,7 +118,7 @@ public class UserServiceImplTests {
             underTest.updateUserPassword(userSavedEntityA.getId(), updatePasswordRequestDto);
             assert false;
         } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("Old password is incorrect");
+            assertThat(e.getMessage()).isEqualTo("Old password is incorrect.");
         }
     }
 
