@@ -12,5 +12,17 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  recipe-service:
+    image: recipe-service:latest
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:specialpassword!@mongodb:27017
+      JWT_SECRET: mySuperSecretKeyThatIsLongEnough12345
+    ports:
+      - "8081:8080"
+
+
 volumes:
   mongodb_data:

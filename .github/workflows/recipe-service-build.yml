@@ -1,0 +1,51 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: recipe-service CI
+
+on:
+  push:
+    paths:
+      - 'services/recipe-service/**'
+  pull_request:
+    paths:
+      - 'services/recipe-service/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-m2
+
+    - name: Make mvnw executable
+      working-directory: services/recipe-service
+      run: chmod +x mvnw
+
+    # - name: Run tests
+    #   working-directory: services/recipe-service
+    #   run: ./mvnw test
+
+    - name: Build jar
+      working-directory: services/recipe-service
+      run: ./mvnw clean package -DskipTests
+
+    - name: Build Docker image
+      run: docker build -t recipe-service ./services/recipe-service
