@@ -35,6 +35,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-m2
 
+    - name: Make mvnw executable - utils
+      working-directory: services/jwt-utils
+      run: chmod +x mvnw
+
+    - name: Build utils
+      working-directory: services/jwt-utils
+      run: ./mvnw clean package -DskipTests
+
     - name: Make mvnw executable
       working-directory: services/recipe-service
       run: chmod +x mvnw
