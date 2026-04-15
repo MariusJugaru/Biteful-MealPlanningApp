@@ -41,7 +41,7 @@ jobs:
 
     - name: Build utils
       working-directory: services/jwt-utils
-      run: ./mvnw clean package -DskipTests
+      run: ./mvnw clean install -DskipTests
 
     - name: Make mvnw executable
       working-directory: services/recipe-service
