@@ -3,14 +3,16 @@ import NavButton from "./NavButton";
 
 function Header() {
     return(
-        <header className="border-b sticky top-0 bg-background z-10">
-            <div className="container mx-auto px-6 py-4">
+        <header className="border-b sticky top-0 bg-[#ffffff] z-10">
+            <div className="mx-auto px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="bg-black text-white p-2 rounded-lg">
-                            <UtensilsCrossed className="w-6 h-6" />
-                        </div>
-                        <h2>Biteful</h2>
+                        <NavButton to="/">
+                            <div className="bg-black text-white p-2 rounded-lg">
+                                <UtensilsCrossed className="w-6 h-6" />
+                            </div>
+                            <h2>Biteful</h2>
+                        </NavButton>
                     </div>
                     <nav className="flex items-center gap-2">
                         <NavButton to="/">
