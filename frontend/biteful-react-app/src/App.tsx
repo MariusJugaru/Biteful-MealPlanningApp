@@ -6,10 +6,11 @@ import Home from "./Pages/Home";
 import Recipes from "./Pages/Recipes";
 import Saved from "./Pages/Saved";
 import SavedRecipe from "./Pages/SavedRecipe";
+import RecipeForm from "./Pages/RecipeForm";
 
 
 function App() {
-  localStorage.setItem("token", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0NGFiMTViZS0yNzBlLTRiMDctODIzZS1kOTA3N2E0YjUzMDEiLCJ1c2VybmFtZSI6InRlc3QiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NjM0MjQ4OCwiZXhwIjoxNzc2MzQ2MDg4fQ.X6E2bpwmE6x5X9vIWLUAouKeQomSFfjTveElPvac4uE");
+  localStorage.setItem("token", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4OWNkNmMxOC00MTMwLTQ0ZDgtYjdmOS0xZjI5MzhhMWU4MmMiLCJ1c2VybmFtZSI6InRlc3QiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NjYwOTQxMCwiZXhwIjoxNzc2NjEzMDEwfQ.9MBHTHDYKhQOwuJ2sr61VgKklQbJgQmE3gPEJThn8qg");
 
   return (
     <BrowserRouter>
@@ -18,6 +19,8 @@ function App() {
         <Route path="/recipes" element={<Recipes />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/saved/:id" element={<SavedRecipe />} />
+        <Route path="/saved/:id/edit" element={<RecipeForm mode="edit"/>} />
+        <Route path="/saved/add" element={<RecipeForm mode="create" />} />
       </Routes>
     </BrowserRouter>
   );

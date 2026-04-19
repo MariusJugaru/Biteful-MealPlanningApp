@@ -3,7 +3,7 @@ import NavButton from "./NavButton";
 
 function Header() {
     return(
-        <header className="border-b sticky top-0 bg-[#ffffff] z-10">
+        <header className="border-b sticky top-0 bg-[#ffffff] z-50">
             <div className="mx-auto px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

@@ -23,6 +23,8 @@ public class RecipeDtoMapper implements Mapper<Recipe, RecipeDto> {
                 .calories(recipe.getCalories())
                 .image(recipe.getImage())
                 .visibility(recipe.getVisibility())
+                .createdAt(recipe.getCreatedAt())
+                .updatedAt(recipe.getUpdatedAt())
                 .build();
     }
 
