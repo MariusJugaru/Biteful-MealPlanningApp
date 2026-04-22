@@ -19,7 +19,7 @@ function RecipeCard({ recipe } : RecipeCardProps) {
             className="cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-200 bg-white"
         >
             <img
-                src={recipe.image}
+                src={`http://localhost:8081/uploads/${recipe.image}`}
                 alt={recipe.title}
                 className="w-full h-80 md:h-60 lg:h-40 object-cover"
             />

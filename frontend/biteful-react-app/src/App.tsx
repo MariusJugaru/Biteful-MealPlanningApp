@@ -10,7 +10,7 @@ import RecipeForm from "./Pages/RecipeForm";
 
 
 function App() {
-  localStorage.setItem("token", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4OWNkNmMxOC00MTMwLTQ0ZDgtYjdmOS0xZjI5MzhhMWU4MmMiLCJ1c2VybmFtZSI6InRlc3QiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NjYwOTQxMCwiZXhwIjoxNzc2NjEzMDEwfQ.9MBHTHDYKhQOwuJ2sr61VgKklQbJgQmE3gPEJThn8qg");
+  localStorage.setItem("token", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZWZkYWUwMC1lMjlhLTQwNDItODYzOS00MTE1MmMxNjM2YjAiLCJ1c2VybmFtZSI6InRlc3QiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3Njg1Njk5NiwiZXhwIjoxNzc2ODYwNTk2fQ.g4Y7vSk6PiYfQOlr8txCMCH-o2KUvMz-wM3fjdFlGPg");
 
   return (
     <BrowserRouter>

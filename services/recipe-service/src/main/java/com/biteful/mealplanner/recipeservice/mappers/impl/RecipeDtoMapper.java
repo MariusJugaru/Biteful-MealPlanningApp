@@ -46,4 +46,5 @@ public class RecipeDtoMapper implements Mapper<Recipe, RecipeDto> {
                 .visibility(recipeDto.getVisibility())
                 .build();
     }
+
 }

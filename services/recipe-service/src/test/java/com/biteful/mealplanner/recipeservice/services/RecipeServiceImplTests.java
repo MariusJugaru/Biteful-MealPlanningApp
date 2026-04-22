@@ -128,4 +128,41 @@ public class RecipeServiceImplTests {
         }
     }
 
+    @Test
+    public void testThatRecipeCanBeUpdated() {
+        // Create recipe
+        Recipe recipe = TestDataUtil.createPrivateRecipeA();
+        Recipe saved = underTest.createRecipe(recipe, UUID.randomUUID(), "USER");
+
+        // Update recipe
+        recipe = TestDataUtil.createPublicRecipeB();
+        recipe.setId(saved.getId());
+        underTest.updateRecipe(saved.getId(), recipe, null, TestDataUtil.createAdminPrincipalA());
+
+        Recipe result = underTest.getRecipeById(saved.getId());
+        assertThat(result).isNotNull();
+        assertThat(result)
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt")
+                .isEqualTo(recipe);
+    }
+
+    @Test
+    public void testThatRecipeCanBeDeleted() {
+        // Create recipe
+        Recipe recipe = TestDataUtil.createPrivateRecipeA();
+        Recipe saved = underTest.createRecipe(recipe, UUID.randomUUID(), "USER");
+
+        // Delete recipe
+        underTest.deleteRecipe(saved.getId(), TestDataUtil.createAdminPrincipalA());
+
+        try {
+            Recipe result = underTest.getRecipeWithAccess(saved.getId(), TestDataUtil.createAdminPrincipalA());
+            assert false;
+        } catch (Exception e) {
+            assertThat(e.getMessage()).isEqualTo(new RecipeNotFound().getMessage());
+        }
+
+    }
+
 }

@@ -7,6 +7,7 @@ import com.biteful.mealplanner.recipeservice.domain.Ingredient;
 import com.biteful.mealplanner.recipeservice.domain.documents.Recipe;
 import com.biteful.mealplanner.recipeservice.domain.dto.RecipeCreateDto;
 import com.biteful.mealplanner.recipeservice.domain.dto.RecipeDto;
+import com.biteful.mealplanner.recipeservice.mappers.MapperFacade;
 import com.biteful.mealplanner.recipeservice.repositories.RecipeRepository;
 import com.biteful.mealplanner.recipeservice.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,6 +44,8 @@ public class RecipeControllerTests {
     public final RecipeRepository recipeRepository;
 
     public String recipeId;
+    @Autowired
+    private MapperFacade mapperFacade;
 
     @Autowired
     public RecipeControllerTests(MockMvc mockMvc,
@@ -64,10 +68,16 @@ public class RecipeControllerTests {
     void testThatRecipeCanBeCreatedAndReturns201() throws Exception {
         RecipeCreateDto recipeCreateDto = TestDataUtil.getRecipeCreateDtoA();
 
+        MockMultipartFile recipePart = new MockMultipartFile(
+                "recipe",
+                "",
+                "application/json",
+                objectMapper.writeValueAsBytes(recipeCreateDto)
+        );
+
         MvcResult result = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/recipes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(recipeCreateDto))
+                MockMvcRequestBuilders.multipart("/api/recipes")
+                        .file(recipePart)
         )
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
@@ -84,10 +94,16 @@ public class RecipeControllerTests {
         // Create recipe
         RecipeCreateDto recipeCreateDto = TestDataUtil.getRecipeCreateDtoA();
 
+        MockMultipartFile recipePart = new MockMultipartFile(
+                "recipe",
+                "",
+                "application/json",
+                objectMapper.writeValueAsBytes(recipeCreateDto)
+        );
+
         MvcResult result = mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/recipes")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(recipeCreateDto))
+                        MockMvcRequestBuilders.multipart("/api/recipes")
+                                .file(recipePart)
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
@@ -114,7 +130,6 @@ public class RecipeControllerTests {
         assertThat(recipeDto.getDescription()).isEqualTo(recipeCreateDto.getDescription());
         assertThat(recipeDto.getVisibility()).isEqualTo(recipeCreateDto.getVisibility());
         assertThat(recipeDto.getServings()).isEqualTo(recipeCreateDto.getServings());
-        assertThat(recipeDto.getImage()).isEqualTo(recipeCreateDto.getImage());
         assertThat(recipeDto.getIngredients()).hasSize(recipeCreateDto.getIngredients().size());
 
         for (int i = 0; i < recipeDto.getIngredients().size(); i++) {
@@ -154,6 +169,53 @@ public class RecipeControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockCustomUser()
+    void testThatUserCanUpdateRecipe() throws Exception {
+        Recipe recipeA = TestDataUtil.createPrivateRecipeA();
+        UserPrincipal user = TestDataUtil.createUserPrincipalA();
+
+        Recipe saved = recipeService.createRecipe(recipeA, user.getId(), user.getRole());
+
+        Recipe recipeB = TestDataUtil.createPublicRecipeB();
+        RecipeDto updatedRecipeDto = mapperFacade.mapToDto(recipeB);
+        updatedRecipeDto.setId(saved.getId());
+
+        MockMultipartFile recipePart = new MockMultipartFile(
+                "recipe",
+                "",
+                "application/json",
+                objectMapper.writeValueAsBytes(updatedRecipeDto)
+        );
+
+        MvcResult result = mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/api/recipes/me/" + saved.getId())
+                                .file(recipePart)
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockCustomUser()
+    void testThatUserCanDeleteOwnRecipe() throws Exception {
+        Recipe recipeA = TestDataUtil.createPrivateRecipeA();
+        UserPrincipal user = TestDataUtil.createUserPrincipalA();
+
+        Recipe saved = recipeService.createRecipe(recipeA, user.getId(), user.getRole());
+
+        MvcResult result = mockMvc.perform(
+                        MockMvcRequestBuilders.delete(String.format("/api/recipes/me/%s", saved.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andReturn();
     }
 }

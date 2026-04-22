@@ -23,8 +23,8 @@ public class MapperFacade {
         this.recipeSummaryMapper = recipeSummaryMapper;
     }
 
-    public Recipe mapFromCreate(RecipeCreateDto recipeCreateDto) {
-        return recipeCreateMapper.mapFrom(recipeCreateDto);
+    public Recipe mapFromCreate(RecipeCreateDto recipeCreateDto, String imageUrl) {
+        return recipeCreateMapper.mapFrom(recipeCreateDto, imageUrl);
     }
 
     public Recipe mapFromDto(RecipeDto recipeDto) {

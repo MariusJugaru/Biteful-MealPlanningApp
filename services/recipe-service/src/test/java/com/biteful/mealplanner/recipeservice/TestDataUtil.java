@@ -88,7 +88,6 @@ public final class TestDataUtil {
                         )
                 )
                 .servings(5)
-                .image("default.png")
                 .visibility("PRIVATE")
                 .build();
         return recipeCreateDto;

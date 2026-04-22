@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,7 +24,6 @@ public class RecipeCreateDto {
     private Integer cookTime;
     private Integer servings;
     private Integer calories;
-    private String image;
     private String visibility;
 
 }

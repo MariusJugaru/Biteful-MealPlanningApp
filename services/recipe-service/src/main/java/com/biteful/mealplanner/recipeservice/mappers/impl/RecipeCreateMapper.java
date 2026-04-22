@@ -24,7 +24,22 @@ public class RecipeCreateMapper implements Mapper<Recipe, RecipeCreateDto> {
                 .cookTime(recipeCreateDto.getCookTime())
                 .servings(recipeCreateDto.getServings() != null ? recipeCreateDto.getServings() : 1)
                 .calories(recipeCreateDto.getCalories() != null ? recipeCreateDto.getCalories() : 0)
-                .image(recipeCreateDto.getImage())
+                .visibility(recipeCreateDto.getVisibility() != null ? recipeCreateDto.getVisibility() : "PRIVATE")
+                .build();
+    }
+
+    public Recipe mapFrom(RecipeCreateDto recipeCreateDto, String imageUrl) {
+        return Recipe.builder()
+                .title(recipeCreateDto.getTitle() != null ? recipeCreateDto.getTitle() : "My new recipe")
+                .description(recipeCreateDto.getDescription())
+                .ingredients(recipeCreateDto.getIngredients())
+                .instructions(recipeCreateDto.getInstructions())
+                .tags(recipeCreateDto.getTags())
+                .prepTime(recipeCreateDto.getPrepTime())
+                .cookTime(recipeCreateDto.getCookTime())
+                .servings(recipeCreateDto.getServings() != null ? recipeCreateDto.getServings() : 1)
+                .calories(recipeCreateDto.getCalories() != null ? recipeCreateDto.getCalories() : 0)
+                .image(imageUrl)
                 .visibility(recipeCreateDto.getVisibility() != null ? recipeCreateDto.getVisibility() : "PRIVATE")
                 .build();
 

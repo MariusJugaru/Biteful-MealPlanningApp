@@ -31,6 +31,20 @@ function SavedRecipe() {
         }
     )
 
+    const handleDelete = async () => {
+        if (!id) return;
+        if (!confirm("Are you sure you want to delete the recipe?")) return;
+
+        await fetch(`http://localhost:8081/api/recipes/me/${id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        navigate("/saved");
+    };
+
     if (loading) return <p>Loading</p>;
     if (error) return <p>{error}</p>
     if (!data) return <p>No data</p>;
@@ -54,7 +68,7 @@ function SavedRecipe() {
                                 Edit
                             </button>
                             <button
-                                onClick={() => navigate("/saved")}
+                                onClick={handleDelete}
                                 className="bg-red-500 text-white px-3 py-2 rounded-md border"
                             >
                                 Delete
@@ -67,7 +81,7 @@ function SavedRecipe() {
                 {/* Image */}
                 <div className="w-full h-64 md:h-96 relative overflow-hidden bg-[#ececf0] -mt-4 lg:rounded-xl">
                     <img
-                        src={data?.image ?? "default.png"}
+                        src={data.image ? `http://localhost:8081/uploads/${data.image}` : "default.png"}
                         alt={data.title}
                         className="w-full h-full object-cover"
                     />

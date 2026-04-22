@@ -22,7 +22,10 @@ services:
       JWT_SECRET: mySuperSecretKeyThatIsLongEnough12345
     ports:
       - "8081:8080"
+    volumes:
+      - recipe_uploads:/app/uploads
 
 
 volumes:
   mongodb_data:
+  recipe_uploads:

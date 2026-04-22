@@ -27,6 +27,8 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         createdAt: null,
         updatedAt: null
     });
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const token = localStorage.getItem("token");
     const isEdit = mode === "edit" && id;
@@ -45,8 +47,22 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     useEffect(() => {
         if (isEdit && data) {
             setRecipe(data);
+            setImageFile(null);
+            setImagePreview(null);
         }
     }, [isEdit, data]);
+
+    const getImageSrc = () => {
+        if (imagePreview) return imagePreview;
+
+        if (!recipe.image) return "default.png";
+
+        if (recipe.image.startsWith("blob:")) {
+            return recipe.image;
+        }
+
+        return `http://localhost:8081/uploads/${recipe.image}`;
+    };
 
     const [tagInput, setTagInput] = useState("");
 
@@ -91,22 +107,32 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const handleSubmit = async () => {
         const token = localStorage.getItem("token");
 
+        const method = isEdit ? "PUT" : "POST";
+
+        const formData = new FormData();
+
+        formData.append(
+            "recipe",
+            new Blob([JSON.stringify(recipe)], { type: "application/json" })
+        );
+
+        if (imageFile) {
+            formData.append("image", imageFile);
+        }
+
         const url = isEdit
             ? `http://localhost:8081/api/recipes/me/${id}`
             : `http://localhost:8081/api/recipes`;
 
-        const method = isEdit ? "PUT" : "POST";
-
         await fetch(url, {
             method,
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(recipe),
+            body: formData,
         });
 
-        navigate("/saved");
+        navigate(isEdit ? location.pathname.replace(/\/edit$/, "") : "/saved")
     };
 
     if (loading) return <p>Loading...</p>;
@@ -148,9 +174,9 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                     className="w-full h-64 md:h-96 bg-[#ececf0] -mt-4 lg:rounded-xl overflow-hidden cursor-pointer flex items-center justify-center"
                     onClick={() => document.getElementById("fileInput")?.click()}
                     >
-                    {recipe.image ? (
+                    {(recipe.image || imagePreview) ? (
                         <img
-                        src={recipe.image}
+                        src={getImageSrc()}
                         className="w-full h-full object-cover"
                         />
                     ) : (
@@ -163,11 +189,13 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                         accept="image/*"
                         className="hidden"
                         onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
+                            const file = e.target.files?.[0];
+                            if (!file) return;
 
-                        const imageUrl = URL.createObjectURL(file);
-                        setRecipe({ ...recipe, image: imageUrl });
+                            setImageFile(file);
+
+                            const preview = URL.createObjectURL(file);
+                            setImagePreview(preview);
                         }}
                     />
                 </div>
