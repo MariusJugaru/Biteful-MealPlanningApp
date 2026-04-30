@@ -81,7 +81,7 @@ function SavedRecipe() {
                 {/* Image */}
                 <div className="w-full h-64 md:h-96 relative overflow-hidden bg-[#ececf0] -mt-4 lg:rounded-xl">
                     <img
-                        src={data.image ? `http://localhost:8081/uploads/${data.image}` : "default.png"}
+                        src={data.image ? `https://biteful-images.s3.eu-central-1.amazonaws.com/${data.image}` : "default.png"}
                         alt={data.title}
                         className="w-full h-full object-cover"
                     />

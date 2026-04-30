@@ -27,8 +27,10 @@ function Saved() {
         }
     )
 
-    if (error) return <p>{error}</p>
-    
+    if (error) {
+        return {error};
+    }
+
     return(
         <>
             <Header />

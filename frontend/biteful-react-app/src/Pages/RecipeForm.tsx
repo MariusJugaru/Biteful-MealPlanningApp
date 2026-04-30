@@ -61,7 +61,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
             return recipe.image;
         }
 
-        return `http://localhost:8081/uploads/${recipe.image}`;
+        return `https://biteful-images.s3.eu-central-1.amazonaws.com/${recipe.image}`;
     };
 
     const [tagInput, setTagInput] = useState("");

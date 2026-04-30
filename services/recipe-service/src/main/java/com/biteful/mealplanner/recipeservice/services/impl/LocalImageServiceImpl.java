@@ -1,6 +1,7 @@
 package com.biteful.mealplanner.recipeservice.services.impl;
 
 import com.biteful.mealplanner.recipeservice.services.FileService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
+@Profile("default")
 public class LocalImageServiceImpl implements FileService {
 
     private final String UPLOAD_DIR = "uploads/";
