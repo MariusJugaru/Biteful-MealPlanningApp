@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-@Profile("default")
+@Profile("!s3")
 public class LocalImageServiceImpl implements FileService {
 
     private final String UPLOAD_DIR = "uploads/";
