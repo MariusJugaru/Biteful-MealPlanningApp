@@ -12,7 +12,7 @@ type RegisterForm = {
 
 function Register() {
     const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false);
+    // const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState<RegisterForm>({
         username: "",
         email: "",
@@ -97,6 +97,7 @@ function Register() {
 
     return (
         <div className="min-h-screen max-h-screen flex items-center justify-center px-4 py-8">
+            <div>{serverMessage}</div>
             <div className="w-full max-w-md flex flex-col gap-6 rounded-xl lg:border md:border md:p-8 ">
                 {/* Header */}
                 <div className="text-center mb-6">

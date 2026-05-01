@@ -34,6 +34,9 @@ spec:
           - name: JWT_SECRET
             value: mySuperSecretKeyThatIsLongEnough12345
 
+          - name: CORS_ALLOWED_ORIGIN
+            value: https://d3b9r33ziyhoy4.cloudfront.net
+
         resources:
           requests:
             memory: "256Mi"

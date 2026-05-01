@@ -1,7 +1,8 @@
-import { User, UtensilsCrossed, Mail, Lock } from "lucide-react";
+import { User, UtensilsCrossed, Lock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import TextInputShort from "../Components/TextInputShort";
+import { config } from "../config";
 
 type LoginForm = {
     usernameOrEmail: string;
@@ -45,7 +46,7 @@ function Login() {
         setErrors({});
 
         // send payload
-        const response = await fetch("http://localhost:8080/api/login", {
+        const response = await fetch(`${config.apiUrl}/api/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -69,6 +70,7 @@ function Login() {
 
     return (
         <div className="min-h-screen max-h-screen flex items-center justify-center px-4 py-8">
+            <div>{serverMessage}</div>
             <div className="w-full max-w-md flex flex-col gap-6 rounded-xl lg:border md:border md:p-8 ">
                 {/* Header */}
                 <div className="text-center mb-6">

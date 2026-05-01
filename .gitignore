@@ -29,3 +29,6 @@ terraform.rc
 .DS_Store
 .idea/
 .vscode/
+
+# Terraform test
+/terraform/test

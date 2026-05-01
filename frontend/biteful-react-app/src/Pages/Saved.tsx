@@ -2,6 +2,7 @@ import Header from "../Components/Header";
 import RecipeCard from "../Components/RecipeCard";
 import NavButton from "../Components/NavButton";
 import useFetch from "../Hooks/useFetch";
+import { config } from "../config";
 
 type Recipe = {
     id: string;
@@ -17,7 +18,7 @@ function Saved() {
     const token = localStorage.getItem("token");
     
     const { data, loading, error } = useFetch<ApiResponse>(
-        "http://localhost:8081/api/recipes/me",
+        `${config.apiUrl}/api/recipes/me`,
         {
             method: "GET",
             headers: {
@@ -28,7 +29,7 @@ function Saved() {
     )
 
     if (error) {
-        return {error};
+        return <div>{error}</div>;
     }
 
     return(

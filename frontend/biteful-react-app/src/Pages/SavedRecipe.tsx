@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../Components/Header";
 import NavButton from "../Components/NavButton";
 
-import { ArrowLeft, Tag, Clock, ChefHat, Flame, Users } from "lucide-react";
+import { ArrowLeft, Clock, ChefHat, Flame, Users } from "lucide-react";
 import InfoCard from "../Components/InfoCard";
 import useFetch from "../Hooks/useFetch";
 import type { Recipe } from "../types/recipe";
 import TagComponent from "../Components/TagComponent";
+import { config } from "../config";
 
 export type Ingredient = {
     name: string;
@@ -21,7 +21,7 @@ function SavedRecipe() {
 
     const token = localStorage.getItem("token");
     const { data, loading, error } = useFetch<Recipe>(
-        `http://localhost:8081/api/recipes/me/${id}`,
+        `${config.apiUrl}/api/recipes/me/${id}`,
         {
             method: "GET",
             headers: {
@@ -35,7 +35,7 @@ function SavedRecipe() {
         if (!id) return;
         if (!confirm("Are you sure you want to delete the recipe?")) return;
 
-        await fetch(`http://localhost:8081/api/recipes/me/${id}`, {
+        await fetch(`${config.apiUrl}/api/recipes/me/${id}`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`,

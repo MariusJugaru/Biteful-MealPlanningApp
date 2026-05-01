@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: recipe-service
-        image: recipe-service:latest
-        # imagePullPolicy: Always
+        image: mariusjugaru/recipe-service:latest
+        imagePullPolicy: Always
         ports:
           - containerPort: 8080
 
@@ -42,6 +42,9 @@ spec:
               secretKeyRef:
                 name: aws-credentials
                 key: AWS_SECRET_ACCESS_KEY
+
+          - name: CORS_ALLOWED_ORIGIN
+            value: https://d3b9r33ziyhoy4.cloudfront.net
 
         resources:
           requests:

@@ -8,6 +8,7 @@ import { ArrowLeft, ChefHat, Clock, Flame, Plus, X, Users } from "lucide-react";
 import type { Ingredient } from "./SavedRecipe";
 import InfoCard from "../Components/InfoCard";
 import TagComponent from "../Components/TagComponent";
+import { config } from "../config";
 
 function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const { id } = useParams();
@@ -34,7 +35,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const isEdit = mode === "edit" && id;
     
     const { data, loading, error } = useFetch<Recipe>(
-        isEdit ? `http://localhost:8081/api/recipes/me/${id}` : null,
+        isEdit ? `${config.apiUrl}/api/recipes/me/${id}` : null,
         {
             method: "GET",
             headers: {
@@ -121,8 +122,8 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         }
 
         const url = isEdit
-            ? `http://localhost:8081/api/recipes/me/${id}`
-            : `http://localhost:8081/api/recipes`;
+            ? `${config.apiUrl}/api/recipes/me/${id}`
+            : `${config.apiUrl}/api/recipes`;
 
         await fetch(url, {
             method,
@@ -139,6 +140,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
 
     return (
         <>
+            <div>{error}</div>
             <Header />
             <div className="min-h-screen bg-[#ffffff] pb-8 lg:px-24">
 
