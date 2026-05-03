@@ -125,15 +125,25 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
             ? `${config.apiUrl}/api/recipes/me/${id}`
             : `${config.apiUrl}/api/recipes`;
 
-        await fetch(url, {
-            method,
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-        });
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
 
-        navigate(isEdit ? location.pathname.replace(/\/edit$/, "") : "/saved")
+            if (!response.ok) {
+                const text = await response.text();
+                alert(`${text}`);
+                return;
+            }
+
+            navigate(isEdit ? location.pathname.replace(/\/edit$/, "") : "/saved");
+        } catch (err) {
+            alert(`Network error: ${String(err)}`);
+        }
     };
 
     if (loading) return <p>Loading...</p>;

@@ -11,10 +11,12 @@ resource "aws_cloudfront_distribution" "frontend" {
 
     origin {
         domain_name = aws_s3_bucket.frontend.bucket_regional_domain_name
-        origin_id   = "s3-frontend"
+        origin_id = "s3-frontend"
 
         origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
     }
+
+    aliases = ["biteful.xyz", "www.biteful.xyz"]
 
     default_root_object = "index.html"
 
@@ -26,10 +28,10 @@ resource "aws_cloudfront_distribution" "frontend" {
         cached_methods   = ["GET", "HEAD"]
 
         forwarded_values {
-        query_string = false
-        cookies {
-            forward = "none"
-        }
+            query_string = false
+            cookies {
+                forward = "none"
+            }
         }
     }
 
@@ -40,7 +42,8 @@ resource "aws_cloudfront_distribution" "frontend" {
     }
 
     viewer_certificate {
-        cloudfront_default_certificate = true
+        acm_certificate_arn = "arn:aws:acm:us-east-1:763253191978:certificate/3cca736f-ccf2-4ec5-96ea-9b2897745a40"
+        ssl_support_method  = "sni-only"
     }
 
     custom_error_response {

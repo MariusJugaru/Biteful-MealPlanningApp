@@ -2,6 +2,7 @@ import { User, UtensilsCrossed, Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import TextInputShort from "../Components/TextInputShort";
+import { config } from "../config";
 
 type RegisterForm = {
     username: string;
@@ -73,14 +74,13 @@ function Register() {
         const { confirmPassword, ...payload } = formData;
         console.log(payload);
 
-        const response = await fetch("http://localhost:8080/api/register", {
+        const response = await fetch(`${config.apiUrl}/api/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
         });
-
 
         const data = await response.json();
 
@@ -97,7 +97,6 @@ function Register() {
 
     return (
         <div className="min-h-screen max-h-screen flex items-center justify-center px-4 py-8">
-            <div>{serverMessage}</div>
             <div className="w-full max-w-md flex flex-col gap-6 rounded-xl lg:border md:border md:p-8 ">
                 {/* Header */}
                 <div className="text-center mb-6">
@@ -109,6 +108,7 @@ function Register() {
                 </div>
 
                 {/* Form */}
+                <div>{serverMessage}</div>
                 <div className="space-y-6 mb-8">
                     {/* Fields */}
                     <TextInputShort

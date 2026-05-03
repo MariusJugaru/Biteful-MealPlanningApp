@@ -44,7 +44,7 @@ spec:
                 key: AWS_SECRET_ACCESS_KEY
 
           - name: CORS_ALLOWED_ORIGIN
-            value: https://d3b9r33ziyhoy4.cloudfront.net
+            value: https://biteful.xyz
 
         resources:
           requests:
