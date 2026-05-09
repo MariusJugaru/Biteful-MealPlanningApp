@@ -15,7 +15,7 @@ import java.util.UUID;
 @Profile("!s3")
 public class LocalImageServiceImpl implements FileService {
 
-    private final String UPLOAD_DIR = "uploads/";
+    private final String UPLOAD_DIR = "/uploads/";
 
     @Override
     public String save(MultipartFile file) {

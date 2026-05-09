@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { config } from "../config";
 
 type Recipe = {
     id: string;
@@ -19,7 +20,7 @@ function RecipeCard({ recipe } : RecipeCardProps) {
             className="cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-200 bg-white"
         >
             <img
-                src={`https://biteful-images.s3.eu-central-1.amazonaws.com/${recipe.image}`}
+                src={`${config.imgSrc}${recipe.image}`}
                 alt={recipe.title}
                 className="w-full h-80 md:h-60 lg:h-40 object-cover"
             />
