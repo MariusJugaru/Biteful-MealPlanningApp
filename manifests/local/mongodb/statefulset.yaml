@@ -30,7 +30,6 @@ spec:
     - metadata:
         name: mongodb-storage
       spec:
-        storageClassName: gp2
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:

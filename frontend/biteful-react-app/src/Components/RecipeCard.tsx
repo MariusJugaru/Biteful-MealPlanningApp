@@ -8,15 +8,21 @@ type Recipe = {
 };
 
 type RecipeCardProps = {
-  recipe: Recipe;
+    recipe: Recipe;
+    mode?: "saved" | "public";
 };
 
-function RecipeCard({ recipe } : RecipeCardProps) {
+function RecipeCard({ recipe, mode = "saved" } : RecipeCardProps) {
     const navigate = useNavigate();
+
+    const api =
+        mode === "saved"
+            ? "/saved/"
+            : "/recipes/";
 
     return (
         <div
-            onClick={() => navigate(`/saved/${recipe.id}`)}
+            onClick={() => navigate(`${api}${recipe.id}`)}
             className="cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-200 bg-white"
         >
             <img

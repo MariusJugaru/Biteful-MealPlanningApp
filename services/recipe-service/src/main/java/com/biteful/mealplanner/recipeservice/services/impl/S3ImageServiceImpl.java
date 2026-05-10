@@ -4,6 +4,8 @@ import com.biteful.mealplanner.recipeservice.services.FileService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -41,6 +43,28 @@ public class S3ImageServiceImpl implements FileService {
             return fileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload to S3", e);
+        }
+    }
+
+    @Override
+    public String copy(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank())
+            return null;
+
+        try {
+            String originalName = imageUrl.substring(imageUrl.indexOf("_") + 1);
+            String newFileName = UUID.randomUUID() + "_" + originalName;
+
+            s3Client.copyObject(builder -> builder
+                    .sourceBucket(bucket)
+                    .sourceKey(imageUrl)
+                    .destinationBucket(bucket)
+                    .destinationKey(newFileName)
+            );
+
+            return newFileName;
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new RuntimeException("Failed to copy image in S3", e);
         }
     }
 

@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Pages
 import Home from "./Pages/Home";
 import Recipes from "./Pages/Recipes";
-import Saved from "./Pages/Saved";
 import SavedRecipe from "./Pages/SavedRecipe";
 import RecipeForm from "./Pages/RecipeForm";
 import Register from "./Pages/Register";
@@ -22,8 +21,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
-        <Route path="/saved" element={<ProtectedRoute><Saved /></ProtectedRoute>} />
+        <Route path="/recipes" element={<ProtectedRoute><Recipes mode="public" /></ProtectedRoute>} />
+        <Route path="/recipes/:id" element={<ProtectedRoute><SavedRecipe mode="public" /></ProtectedRoute>} />
+        <Route path="/saved" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
         <Route path="/saved/:id" element={<ProtectedRoute><SavedRecipe /></ProtectedRoute>} />
         <Route path="/saved/:id/edit" element={<ProtectedRoute><RecipeForm mode="edit"/></ProtectedRoute>} />
         <Route path="/saved/add" element={<ProtectedRoute><RecipeForm mode="create" /></ProtectedRoute>} />

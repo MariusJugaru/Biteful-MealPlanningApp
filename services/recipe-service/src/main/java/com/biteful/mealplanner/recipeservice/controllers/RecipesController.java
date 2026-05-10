@@ -62,6 +62,22 @@ public class RecipesController {
                 .body(response);
     }
 
+    // Saves a public recipe to a user's account
+    @PostMapping("/save/{recipeId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Map<String, String>> savePublicRecipe(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable String recipeId) {
+
+        Recipe copy = recipeService.copyRecipe(recipeId, principal.getId());
+
+        Map<String, String> response = Map.of("id", copy.getId());
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
     // Returns all the recipes in the database, paginated.
     @GetMapping
     @PreAuthorize(("hasRole('ADMIN')"))
@@ -90,6 +106,19 @@ public class RecipesController {
         return recipes.map(mapperFacade::mapToSummary);
     }
 
+    @GetMapping("/public")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public Page<RecipeSummaryDto> getPublicRecipesEndpoint(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Recipe> recipes = recipeService.getPublicRecipes(pageable);
+
+        return recipes.map(mapperFacade::mapToSummary);
+    }
+
     // Returns a specific recipe created by the authenticated user.
     @GetMapping("/me/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -113,6 +142,7 @@ public class RecipesController {
         return mapperFacade.mapToDto(recipe);
     }
 
+    // Updates a recipe.
     @PutMapping("/me/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Map<String, String>> updateMyRecipe(
@@ -131,6 +161,7 @@ public class RecipesController {
                 .body(response);
     }
 
+    // Deletes a recipe.
     @DeleteMapping("/me/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteMyRecipe(

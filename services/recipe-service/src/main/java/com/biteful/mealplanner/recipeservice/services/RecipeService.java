@@ -14,6 +14,8 @@ public interface RecipeService {
 
     public Recipe createRecipe(Recipe recipe, UUID userId, String role);
 
+    public Recipe copyRecipe(String recipeId, UUID userId);
+
     public Recipe getRecipeById(String id);
 
     public Page<Recipe> getRecipesByUser(UUID userId, Pageable pageable);
@@ -25,6 +27,8 @@ public interface RecipeService {
     boolean isEditableByUser(String recipeId, UserPrincipal userPrincipal);
 
     public Page<Recipe> getAllRecipes(Pageable pageable);
+
+    public Page<Recipe> getPublicRecipes(Pageable pageable);
 
     public Recipe updateRecipe(String id, Recipe updatedRecipe, MultipartFile image, UserPrincipal principal);
 

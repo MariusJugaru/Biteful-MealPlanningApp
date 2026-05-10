@@ -37,6 +37,31 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public Recipe copyRecipe(String recipeId, UUID userId) {
+        Recipe original = getRecipeById(recipeId);
+
+        String imageCopy = fileService.copy(original.getImage());
+
+        Recipe copy = Recipe.builder()
+                .userId(userId)
+                .userType(original.getUserType())
+                .title(original.getTitle())
+                .description(original.getDescription())
+                .ingredients(original.getIngredients())
+                .instructions(original.getInstructions())
+                .tags(original.getTags())
+                .prepTime(original.getPrepTime())
+                .cookTime(original.getCookTime())
+                .servings(original.getServings())
+                .calories(original.getCalories())
+                .image(imageCopy)
+                .visibility("private")
+                .build();
+
+        return recipeRepository.save(copy);
+    }
+
+    @Override
     public Recipe getRecipeById(String id) {
         return recipeRepository.findById(id)
                 .orElseThrow(RecipeNotFound::new);
@@ -89,6 +114,11 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Page<Recipe> getAllRecipes(Pageable pageable) {
         return recipeRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Recipe> getPublicRecipes(Pageable pageable) {
+        return recipeRepository.findByVisibility("public", pageable);
     }
 
     @Override

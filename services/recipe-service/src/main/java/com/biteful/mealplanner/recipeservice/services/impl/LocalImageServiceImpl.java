@@ -39,6 +39,29 @@ public class LocalImageServiceImpl implements FileService {
     }
 
     @Override
+    public String copy(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank())
+            return null;
+
+        try {
+            String originalFileName = Paths.get(imageUrl).getFileName().toString();
+            String originalName = imageUrl.substring(imageUrl.indexOf("_") + 1);
+            String newFileName = UUID.randomUUID() + "_" + originalName;
+
+            Path dir = Paths.get(UPLOAD_DIR);
+
+            Path src = dir.resolve(originalFileName);
+            Path dest = dir.resolve(newFileName);
+
+            Files.copy(src, dest);
+
+            return newFileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to copy image", e);
+        }
+    }
+
+    @Override
     public void delete(String imageUrl) {
         if (imageUrl == null || imageUrl.isEmpty()) return;
 

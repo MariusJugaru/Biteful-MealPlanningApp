@@ -15,13 +15,18 @@ export type Ingredient = {
     unit?: string;
 }
 
-function SavedRecipe() {
+function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public"}) {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    const api =
+        mode === "saved"
+            ? "/api/recipes/me/"
+            : "/api/recipes/"
+
     const token = localStorage.getItem("token");
     const { data, loading, error } = useFetch<Recipe>(
-        `${config.apiUrl}/api/recipes/me/${id}`,
+        `${config.apiUrl}${api}${id}`,
         {
             method: "GET",
             headers: {
@@ -45,6 +50,21 @@ function SavedRecipe() {
         navigate("/saved");
     };
 
+    const handleSave = async () => {
+        if (!id) return;
+
+        const response = await fetch(`${config.apiUrl}/api/recipes/save/${id}`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        navigate(`/saved/${data.id}`);
+    }
+
     if (loading) return <p>Loading</p>;
     if (error) return <p>{error}</p>
     if (!data) return <p>No data</p>;
@@ -57,23 +77,38 @@ function SavedRecipe() {
                 {/* Header with return button */}
                 <div className="sticky top-0 z-10 bg-[#ffffff] border-b">
                     <div className="flex items-center justify-between px-4 py-2">
-                        <NavButton to="/saved">
+                        <NavButton to={mode === "saved" ? "/saved" : "/recipes"}>
                             <ArrowLeft className="w-4 h-4" />
                         </NavButton>
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => navigate(`${location.pathname}/edit`)}
-                                className="px-3 py-2 rounded-md border"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="bg-red-500 text-white px-3 py-2 rounded-md border"
-                            >
-                                Delete
-                            </button>
-                        </div>
+
+                        { mode === "saved" && (
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => navigate(`${location.pathname}/edit`)}
+                                    className="px-3 py-2 rounded-md border"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="bg-red-500 text-white px-3 py-2 rounded-md border"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+
+                        { mode === "public" && (
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={handleSave}
+                                    className="bg-[#000000] text-white px-3 py-2 rounded-md border"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        )}
+
                         
                     </div>
                 </div>

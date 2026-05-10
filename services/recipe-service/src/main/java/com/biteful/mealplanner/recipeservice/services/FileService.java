@@ -6,5 +6,7 @@ public interface FileService {
 
     String save(MultipartFile file);
 
+    String copy(String imageUrl);
+
     void delete(String imageUrl);
 }
