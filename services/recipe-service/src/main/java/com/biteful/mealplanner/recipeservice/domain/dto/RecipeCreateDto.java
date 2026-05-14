@@ -16,6 +16,7 @@ import java.util.List;
 public class RecipeCreateDto {
 
     private String title;
+    private String image;
     private String description;
     private List<Ingredient> ingredients;
     private String instructions;

@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -43,6 +44,32 @@ public class S3ImageServiceImpl implements FileService {
             return fileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload to S3", e);
+        }
+    }
+
+    @Override
+    public String saveFromUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+
+        try {
+            String fileName = UUID.randomUUID() + "_ai.jpg";
+            byte[] bytes;
+
+            try (InputStream in = new java.net.URL(url).openStream()) {
+                bytes = in.readAllBytes();
+            }
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .contentType("image/jpeg")
+                    .build();
+
+            s3Client.putObject(request, RequestBody.fromBytes(bytes));
+
+            return fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to download image from URL to S3", e);
         }
     }
 

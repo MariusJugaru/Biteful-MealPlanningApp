@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +36,26 @@ public class LocalImageServiceImpl implements FileService {
             return fileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to save file", e);
+        }
+    }
+
+    @Override
+    public String saveFromUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+
+        try {
+            String fileName = UUID.randomUUID() + "_ai.jpg";
+            Path dir = Paths.get(UPLOAD_DIR);
+            Files.createDirectories(dir);
+            Path dest = dir.resolve(fileName);
+
+            try (InputStream in = new java.net.URL(url).openStream()) {
+                Files.copy(in, dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to download image from URL", e);
         }
     }
 

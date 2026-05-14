@@ -9,6 +9,7 @@ import type { Ingredient } from "./SavedRecipe";
 import InfoCard from "../Components/InfoCard";
 import TagComponent from "../Components/TagComponent";
 import { config } from "../config";
+import { useLocation } from "react-router-dom";
 
 function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const { id } = useParams();
@@ -44,6 +45,14 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
             },
         }
     );
+
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.aiRecipe && !isEdit) {
+            setRecipe(location.state.aiRecipe);
+        }
+    }, [location.state, isEdit]);
     
     useEffect(() => {
         if (isEdit && data) {
@@ -58,7 +67,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
 
         if (!recipe.image) return "default.png";
 
-        if (recipe.image.startsWith("blob:")) {
+        if (recipe.image.startsWith("blob:") || recipe.image.startsWith("http")) {
             return recipe.image;
         }
 

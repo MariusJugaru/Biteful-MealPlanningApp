@@ -46,6 +46,12 @@ spec:
           - name: CORS_ALLOWED_ORIGIN
             value: https://biteful.xyz
 
+          - name: GEMINI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: gemini-secret
+                key: GEMINI_API_KEY
+
         resources:
           requests:
             memory: "256Mi"

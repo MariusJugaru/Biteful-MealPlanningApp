@@ -3,6 +3,9 @@ import RecipeCard from "../Components/RecipeCard";
 import NavButton from "../Components/NavButton";
 import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
+import { Sparkles } from "lucide-react";
+import AiRecipeModal from "../Components/AiRecipeModal";
+import { useState } from "react";
 
 type Recipe = {
     id: string;
@@ -16,6 +19,8 @@ type ApiResponse = {
 
 function Recipes({ mode = "saved" } : { mode?: "saved" | "public"}) {
     const token = localStorage.getItem("token");
+    
+    const [aiOpen, setAiOpen] = useState(false);
 
     const api =
         mode === "saved"
@@ -50,11 +55,19 @@ function Recipes({ mode = "saved" } : { mode?: "saved" | "public"}) {
 
                     {/* Add recipe button */}
                     {mode === "saved" && (
-                        <NavButton to="/saved/add" variant="gray">
-                            Add Recipe
-                        </NavButton>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setAiOpen(true)}
+                                className="flex items-center gap-2 bg-black text-white px-3 py-2 rounded-md text-sm font-medium"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                AI Recipe
+                            </button>
+                            <NavButton to="/saved/add" variant="gray">
+                                Add Recipe
+                            </NavButton>
+                        </div>
                     )}
-                    
                 </div>
                 
                 {loading ? (
@@ -75,7 +88,10 @@ function Recipes({ mode = "saved" } : { mode?: "saved" | "public"}) {
                 </pre>
             } */}
             
-            
+            <AiRecipeModal
+                open={aiOpen}
+                onClose={() => setAiOpen(false)}
+            />
         </>
     );
 }

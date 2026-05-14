@@ -46,7 +46,14 @@ public class RecipesController {
             @RequestPart(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal UserPrincipal principal) {
 
-        String url = fileService.save(image);
+        String url;
+        if (image != null && !image.isEmpty()) {
+            url = fileService.save(image);
+        } else if (recipeCreateDto.getImage() != null && recipeCreateDto.getImage().startsWith("http")) {
+            url = fileService.saveFromUrl(recipeCreateDto.getImage());
+        } else {
+            url = null;
+        }
 
         Recipe recipe = mapperFacade.mapFromCreate(recipeCreateDto, url);
         Recipe saved = recipeService.createRecipe(

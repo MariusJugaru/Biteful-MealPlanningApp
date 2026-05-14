@@ -32,3 +32,6 @@ terraform.rc
 
 # Terraform test
 /terraform/test
+
+#Env vars
+.env
