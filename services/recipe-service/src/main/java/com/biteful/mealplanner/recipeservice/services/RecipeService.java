@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ public interface RecipeService {
     public Recipe copyRecipe(String recipeId, UUID userId);
 
     public Recipe getRecipeById(String id);
+
+    public List<Recipe> getRecipesByIds(List<String> ids);
 
     public Page<Recipe> getRecipesByUser(UUID userId, Pageable pageable);
 

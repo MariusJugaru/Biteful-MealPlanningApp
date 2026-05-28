@@ -8,7 +8,7 @@ type StatCardProps = {
 
 function StatCard({ label, value, icon: Icon } : StatCardProps) {
     return (
-        <div className="flex items-center gap-3 bg-card border rounded-lg p-6">
+        <div className="flex items-center gap-3 bg-[#ffffff] border rounded-lg p-6">
             {Icon && (
                 <Icon className="w-8 h-8 text-muted-foreground" />
             )}

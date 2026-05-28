@@ -19,4 +19,6 @@ public interface RecipeRepository extends MongoRepository<Recipe, String> {
     List<Recipe> findByUserIdAndVisibility(UUID userId, String visibility);
 
     Page<Recipe> findByVisibility(String visibility, Pageable pageable);
+
+    List<Recipe> findByIdIn(List<String> ids);
 }

@@ -28,7 +28,7 @@ spec:
       containers:
         - name: recipe-service
           image: recipe-service:latest
-          imagePullPolicy: Always
+          # imagePullPolicy: Always
 
           ports:
             - containerPort: 8080
@@ -40,6 +40,15 @@ spec:
           env:
             - name: MONGO_URI
               value: mongodb://mongodb:specialpassword!@mongodb:27017/admin
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/biteful
+
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: specialpassword!
 
             - name: JWT_SECRET
               value: mySuperSecretKeyThatIsLongEnough12345

@@ -34,8 +34,6 @@ spec:
           - name: JWT_SECRET
             value: mySuperSecretKeyThatIsLongEnough12345
 
-          # - name: CORS_ALLOWED_ORIGIN
-            # value: https://biteful.xyz
 
         resources:
           requests:

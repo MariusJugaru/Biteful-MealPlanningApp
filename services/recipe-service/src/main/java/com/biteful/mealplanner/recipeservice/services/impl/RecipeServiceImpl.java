@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,6 +66,11 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe getRecipeById(String id) {
         return recipeRepository.findById(id)
                 .orElseThrow(RecipeNotFound::new);
+    }
+
+    @Override
+    public List<Recipe> getRecipesByIds(List<String> ids) {
+        return recipeRepository.findByIdIn(ids);
     }
 
     @Override

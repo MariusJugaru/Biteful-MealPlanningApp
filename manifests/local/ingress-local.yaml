@@ -60,3 +60,11 @@ spec:
                 name: recipe-service
                 port:
                   number: 80
+
+          - path: /api/plans
+            pathType: Prefix
+            backend:
+              service:
+                name: recipe-service
+                port:
+                  number: 80

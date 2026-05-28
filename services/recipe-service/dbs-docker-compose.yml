@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: specialpassword!
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  postgresql_db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: biteful
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: specialpassword!
+    volumes:
+      - postgres_biteful:/var/lib/postgresql/data
+
+volumes:
+  mongodb_data:
+  postgres_biteful:
