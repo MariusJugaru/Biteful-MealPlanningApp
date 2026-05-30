@@ -1,26 +1,36 @@
 import { X, Plus } from "lucide-react";
 import { config } from "../config";
-
+import { useNavigate } from "react-router-dom";
 
 type MealSlotProps = {
-    mealType: string;
+    mealType: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
     recipe?: {
         recipeId?: string;
         title?: string;
         calories?: number;
         image?: string | null;
+        date?: string;
     };
     onAdd?: () => void;
-    onRemove?: () => void;
+    onRemove?: (
+        date: string,
+        mealType: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK"
+    ) => void;
 }
 
 export function MealSlot({ mealType, recipe, onAdd, onRemove }: MealSlotProps) {
     const hasRecipe = !!recipe;
-
+    const navigate = useNavigate();
+    
     return (
         <div
+            onClick={() => {
+                if (hasRecipe && recipe?.recipeId) {
+                    navigate(`/meals/${recipe.recipeId}`)
+                }
+            }}
             className={`overflow-hidden rounded-xl border flex flex-col 
-                ${hasRecipe ? "bg-white" : "bg-[#f6f6f8]"}`
+                ${hasRecipe ? "bg-white cursor-pointer hover:bg-[#ececec] transition" : "bg-[#f6f6f8]"}`
             }
         >
             <div className="p-3 flex items-start justify-between">
@@ -28,8 +38,17 @@ export function MealSlot({ mealType, recipe, onAdd, onRemove }: MealSlotProps) {
 
                 {hasRecipe && (
                     <button
-                        onClick={onRemove}
-                        className="h-6 w-6 -mt-1 -mr-1 inline-flex items-center justify-center rounded-md hover:bg-[#e9ebef]"
+                        onClick={(e) => {
+                            e.stopPropagation();
+
+                            if (recipe?.date && mealType) {
+                                onRemove?.(
+                                    recipe.date,
+                                    mealType
+                                )
+                            }
+                        }}
+                        className="h-6 w-6 -mt-1 -mr-1 inline-flex items-center justify-center rounded-md hover:bg-[#d6d7db]"
                     >
                         <X className="w-4 h-4" />
                     </button>

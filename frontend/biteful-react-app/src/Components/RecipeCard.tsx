@@ -10,9 +10,10 @@ type Recipe = {
 type RecipeCardProps = {
     recipe: Recipe;
     mode?: "saved" | "public";
+    onClick?: (recipe: Recipe) => void;
 };
 
-function RecipeCard({ recipe, mode = "saved" } : RecipeCardProps) {
+function RecipeCard({ recipe, mode = "saved", onClick } : RecipeCardProps) {
     const navigate = useNavigate();
 
     const api =
@@ -20,9 +21,17 @@ function RecipeCard({ recipe, mode = "saved" } : RecipeCardProps) {
             ? "/saved/"
             : "/recipes/";
 
+    function handleClick() {
+        if (onClick) {
+            onClick(recipe);
+        } else {
+            navigate(`${api}${recipe.id}`);
+        }
+    }
+
     return (
         <div
-            onClick={() => navigate(`${api}${recipe.id}`)}
+            onClick={handleClick}
             className="cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-200 bg-white"
         >
             <img

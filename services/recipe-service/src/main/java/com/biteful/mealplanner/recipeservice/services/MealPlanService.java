@@ -13,7 +13,7 @@ public interface MealPlanService {
 
     public List<MealResponse> getMealsInRange(UUID userId, LocalDate startDate, LocalDate endDate);
 
-    public void addMeal(UUID userId, LocalDate date, MealType type, String recipeId);
+    public MealResponse addMeal(UUID userId, LocalDate date, MealType type, String recipeId);
 
     public void removeMeal(UUID userId, LocalDate date, MealType type);
 

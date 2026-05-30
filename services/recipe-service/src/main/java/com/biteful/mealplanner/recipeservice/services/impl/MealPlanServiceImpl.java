@@ -79,7 +79,7 @@ public class MealPlanServiceImpl implements MealPlanService {
     }
 
     @Override
-    public void addMeal(UUID userId, LocalDate date, MealType type, String recipeId) {
+    public MealResponse addMeal(UUID userId, LocalDate date, MealType type, String recipeId) {
         MealPlanEntity entity = MealPlanEntity.builder()
                 .id(
                         MealPlanId.builder()
@@ -91,7 +91,22 @@ public class MealPlanServiceImpl implements MealPlanService {
                 .recipeId(recipeId)
                 .build();
 
+        Recipe recipe = recipeService.getRecipeById(recipeId);
+
+        if (recipe == null) {
+            throw new RuntimeException("Recipe not found");
+        }
+
         mealPlanRepository.save(entity);
+
+        return MealResponse.builder()
+                .recipeId(recipeId)
+                .title(recipe.getTitle())
+                .type(type)
+                .date(date)
+                .image(recipe.getImage())
+                .calories(recipe.getCalories())
+                .build();
     }
 
     @Override

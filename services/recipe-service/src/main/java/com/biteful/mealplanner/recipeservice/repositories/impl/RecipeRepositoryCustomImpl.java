@@ -27,12 +27,12 @@ public class RecipeRepositoryCustomImpl implements RecipeRepositoryCustom {
     public List<Recipe> getRecipeCandidates(MealType type, List<String> allergens, boolean excludeUser, UUID userId) {
         List<Criteria> criteriaList = new ArrayList<>();
 
-        criteriaList.add(Criteria.where("visibility").is("public"));
-
         if (userId != null) {
             if (excludeUser) {
+                criteriaList.add(Criteria.where("visibility").is("public"));
                 criteriaList.add(Criteria.where("userId").ne(userId));
             } else {
+//                criteriaList.add(Criteria.where("visibility").is("private"));
                 criteriaList.add(Criteria.where("userId").is(userId));
             }
         }

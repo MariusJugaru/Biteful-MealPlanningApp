@@ -15,7 +15,7 @@ export type Ingredient = {
     unit?: string;
 }
 
-function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public"}) {
+function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -77,7 +77,11 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public"}) {
                 {/* Header with return button */}
                 <div className="sticky top-0 z-10 bg-[#ffffff] border-b">
                     <div className="flex items-center justify-between px-4 py-2">
-                        <NavButton to={mode === "saved" ? "/saved" : "/recipes"}>
+                        <NavButton to={mode === "saved" 
+                            ? "/saved" 
+                            : mode === "home"
+                            ? "/"
+                            : "/recipes"}>
                             <ArrowLeft className="w-4 h-4" />
                         </NavButton>
 

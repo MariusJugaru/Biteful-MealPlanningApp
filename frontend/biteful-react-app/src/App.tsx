@@ -11,6 +11,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Logout from "./Pages/Logout";
 
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+
 
 
 
@@ -27,6 +30,7 @@ function App() {
         <Route path="/saved/:id" element={<ProtectedRoute><SavedRecipe /></ProtectedRoute>} />
         <Route path="/saved/:id/edit" element={<ProtectedRoute><RecipeForm mode="edit"/></ProtectedRoute>} />
         <Route path="/saved/add" element={<ProtectedRoute><RecipeForm mode="create" /></ProtectedRoute>} />
+        <Route path="/meals/:id" element={<ProtectedRoute><SavedRecipe mode="home" /></ProtectedRoute>} />
 
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

@@ -39,11 +39,11 @@ public class MealPlansController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public void addMealEndpoint(
+    public MealResponse addMealEndpoint(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody MealPlanItem request
     ) {
-        mealPlanService.addMeal(
+        return mealPlanService.addMeal(
                 principal.getId(),
                 request.getDate(),
                 request.getType(),
@@ -64,7 +64,7 @@ public class MealPlansController {
         );
     }
 
-    @GetMapping("/generate")
+    @PostMapping("/generate")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<MealResponse> getPlan(
             @AuthenticationPrincipal UserPrincipal principal,
