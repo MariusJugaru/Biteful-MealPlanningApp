@@ -69,7 +69,7 @@ public class MealPlanServiceImpl implements MealPlanService {
                     .type(entity.getId().getType())
                     .date(entity.getId().getDate())
                     .image(recipe.getImage())
-                    .calories(recipe.getServings() <= 0 ? 0 : recipe.getCalories())
+                    .calories(recipe.getCalories())
                     .build();
 
             response.add(meal);
@@ -162,8 +162,15 @@ public class MealPlanServiceImpl implements MealPlanService {
     public void generatePlanForMealType(UUID userId, List<MealResponse> meals, MealType type, UserPreferences preferences) {
 
         // Get recipe candidates
-        List<Recipe> publicRecipes = recipeRepositoryCustom.getRecipeCandidates(type, preferences.getRestrictions(), true, userId);
-        List<Recipe> savedRecipes = recipeRepositoryCustom.getRecipeCandidates(type, preferences.getRestrictions(), false, userId);
+        List<Recipe> publicRecipes = new ArrayList<>();
+        List<Recipe> savedRecipes = new ArrayList<>();
+
+        if (preferences.isHasPrivate()) {
+            savedRecipes = recipeRepositoryCustom.getRecipeCandidates(type, preferences.getRestrictions(), false, userId);
+        }
+        if (preferences.isHasPublic()) {
+            publicRecipes = recipeRepositoryCustom.getRecipeCandidates(type, preferences.getRestrictions(), true, userId);
+        }
 
         List<Recipe> allRecipes = new ArrayList<>();
         allRecipes.addAll(publicRecipes);
@@ -171,8 +178,13 @@ public class MealPlanServiceImpl implements MealPlanService {
 
         // If there are no candidates for a meal type use any type.
         if (allRecipes.isEmpty()) {
-            publicRecipes = recipeRepositoryCustom.getRecipeCandidates(null, preferences.getRestrictions(), true, userId);
-            savedRecipes = recipeRepositoryCustom.getRecipeCandidates(null, preferences.getRestrictions(), false, userId);
+
+            if (preferences.isHasPrivate()) {
+                savedRecipes = recipeRepositoryCustom.getRecipeCandidates(null, preferences.getRestrictions(), false, userId);
+            }
+            if (preferences.isHasPublic()) {
+                publicRecipes = recipeRepositoryCustom.getRecipeCandidates(null, preferences.getRestrictions(), true, userId);
+            }
 
             allRecipes.addAll(publicRecipes);
             allRecipes.addAll(savedRecipes);
@@ -196,7 +208,10 @@ public class MealPlanServiceImpl implements MealPlanService {
         }
 
         Set<Recipe> used = new HashSet<>();
-        int span = preferences.getDays() / preferences.getCookingTimesPerPlan();
+        int span = 1;
+        if (preferences.getCookingTimesPerPlan() != 5) {
+            span = preferences.getDays() / preferences.getCookingTimesPerPlan();
+        }
         for (int i = 0; i < preferences.getCookingTimesPerPlan(); i++) {
 
             // Get a recipe that will be used for floor(preferences.getDays() / preferences.getCookingTimesPerPlan()) days.

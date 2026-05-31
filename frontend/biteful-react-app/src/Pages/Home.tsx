@@ -45,6 +45,9 @@ function getWeekBounds(baseDate: Date) {
 }
 
 function Home() {
+    const token = localStorage.getItem("token");
+
+    // Get week interval
     const [currentWeekDate, setCurrentWeekDate] = useState(new Date());
     const { startDate, endDate, dates } = getWeekBounds(currentWeekDate);
 
@@ -64,26 +67,9 @@ function Home() {
         });
     };
 
+    // Get meals
     const [meals, setMeals] = useState<MealResponse[]>([]);
-
-    const [generatePlanModal, setGeneratePlanModal] = useState<{
-        open: boolean;
-    }>({
-        open: false,
-    });
-
-    const [addMealModal, setAddMealModal] = useState<{
-        open: boolean;
-        day: string;
-        type: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
-    }>({
-        open: false,
-        day: "",
-        type: "BREAKFAST",
-    });
     
-    const token = localStorage.getItem("token");
-
     useEffect(() => {    
         async function loadMeals() {
             const response = await fetch(`${config.apiUrl}/api/plans?startDate=${startDate}&endDate=${endDate}`, {
@@ -102,17 +88,54 @@ function Home() {
         loadMeals();
     }, [startDate, endDate]);
 
+        // Generate meal plan modal
+    const [generatePlanModal, setGeneratePlanModal] = useState<{
+        open: boolean;
+    }>({
+        open: false,
+    });
+
+    const [generatedMeals, setGeneratedMeals] = useState<MealResponse[]>([]);
+
+    function getMeals() {
+        if (generatedMeals.length > 0) 
+            return generatedMeals;
+        return meals;
+    }
+
     const getMeal = (
         date: string,
         type: string
     ) => {
-        return meals.find(
+        return getMeals().find(
             meal =>
                 meal.date === date &&
                 meal.type === type
         );
     };
 
+    const displayedMeals =
+        generatedMeals.length > 0
+            ? generatedMeals
+            : meals;
+
+    const currentWeekMeals = displayedMeals.filter(
+        meal =>
+            meal.date >= startDate &&
+            meal.date <= endDate
+    );
+
+    // Modify meal plan
+    const [addMealModal, setAddMealModal] = useState<{
+        open: boolean;
+        day: string;
+        type: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
+    }>({
+        open: false,
+        day: "",
+        type: "BREAKFAST",
+    });
+    
     function openAddMeal(date: string, type: MealResponse["type"]) {
         setAddMealModal({
             open: true,
@@ -122,6 +145,7 @@ function Home() {
     }
 
     async function addMeal(recipeId: string) {
+        
         const response = await fetch(`${config.apiUrl}/api/plans`, {
             method: "POST",
             headers: {
@@ -154,6 +178,16 @@ function Home() {
         date: string,
         type: string
     ) {
+        if (generatedMeals.length > 0) {
+            setGeneratedMeals(prev =>
+                prev.filter(
+                    meal =>
+                        !(meal.date === date && meal.type === type)
+                )
+            );
+            return;
+        }
+
         const response = await fetch(
             `${config.apiUrl}/api/plans`,
             {
@@ -185,15 +219,60 @@ function Home() {
         );
     }
 
+    async function saveGeneratedPlan(
+        generatedPlan: MealResponse[],
+    ) {
+        console.log(JSON.stringify(generatedMeals))
+
+        const response = await fetch(
+            `${config.apiUrl}/api/plans/save`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(generatedMeals)
+            }
+        )
+
+        
+
+        if (!response.ok) {
+            console.error("Save failed");
+            return;
+        }
+
+        setMeals(prev => {
+            const generatedKeys = new Set(
+                generatedMeals.map(
+                    meal => `${meal.date}-${meal.type}`
+                )
+            );
+
+            return [
+                ...prev.filter(
+                    meal =>
+                        !generatedKeys.has(
+                            `${meal.date}-${meal.type}`
+                        )
+                ),
+                ...generatedMeals
+            ];
+        });
+        setGeneratedMeals([]);
+    }
+
     return (
         <>
             <Header />
 
             <div className="mx-auto px-12 py-8 select-none">
 
+                {/* Weekly Calories and Daily Avg. */}
                 <StatsSection
                     totalWeeklyCalories={
-                        meals.reduce(
+                        currentWeekMeals.reduce(
                             (sum, meal) =>
                                 sum + meal.calories,
                             0
@@ -203,7 +282,11 @@ function Home() {
 
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
+
+                        {/* Header */}
                         <h3 className="mt-4 mb-4">Weekly Meal Plan</h3>
+
+                        {/* Week picker */}
                         <div className="flex items-center gap-2">
                             <div 
                                 className="rounded-md border p-1.5 hover:bg-[#ececec] active:bg-[#dbdbdb] transition" 
@@ -221,15 +304,42 @@ function Home() {
                         </div>
                        
                     </div>
-                    <button
-                        onClick={() => setGeneratePlanModal({ open: true })}
-                        className="flex items-center gap-2 bg-black text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                        Generate Plan
-                    </button>
+
+                    <div className="flex items-center gap-2">
+                        {/* Save Generated Plan Button */}
+                        {generatedMeals.length > 0 && (
+                            <button
+                                onClick={() => saveGeneratedPlan(generatedMeals)}
+                                className="flex items-center gap-2 bg-green-400 text-white px-3 py-2 rounded-md text-sm font-medium"
+                            >
+                                Save
+                            </button>
+                        )}
+
+                        {/* Cancel Generated Plan Button */}
+                        {generatedMeals.length > 0 && (
+                            <button
+                                onClick={() => setGeneratedMeals([])}
+                                className="flex items-center gap-2 bg-gray-200 text-black border px-3 py-2 rounded-md text-sm font-medium"
+                            >
+                                Cancel
+                            </button>
+                        )}
+
+                        {/* Generate Plan Modal Button */}
+                        <button
+                            onClick={() => setGeneratePlanModal({ open: true })}
+                            className="flex items-center gap-2 bg-black text-white px-3 py-2 rounded-md text-sm font-medium"
+                        >
+                            Generate Plan
+                        </button>
+                        
+                    </div>
+                    
                 </div>
 
                 <div className="hidden lg:grid lg:grid-cols-7 gap-4">
+                    {/* Load Meals */}
                     {dates.map(day => (
                         <div
                             key={day.date}
@@ -278,6 +388,8 @@ function Home() {
                     ))}
                 </div>
             </div>
+
+            {/* Add Meal for Slot */}
             <AddMealModal 
                 open={addMealModal.open}
                 onClose={() =>
@@ -290,13 +402,15 @@ function Home() {
                 date={addMealModal.day}
                 onSelectRecipe={addMeal}
             />
+
+            {/* Generate Plan Modal */}
             <GeneratePlanModal 
                 open={generatePlanModal.open}
                 onClose={() =>
                     setGeneratePlanModal({open: false})
                 }
                 onGenerated={(generatedMeals) => {
-                    setMeals(generatedMeals);
+                    setGeneratedMeals(generatedMeals);
                 }}
             />
         </>

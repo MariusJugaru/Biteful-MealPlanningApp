@@ -90,7 +90,7 @@ public class RecipesController {
     @PreAuthorize(("hasRole('ADMIN')"))
     public Page<RecipeSummaryDto> getAllRecipes(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Recipe> recipes = recipeService.getAllRecipes(pageable);
@@ -105,7 +105,7 @@ public class RecipesController {
     public Page<RecipeSummaryDto> getMyRecipes(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Recipe> recipes = recipeService.getRecipesByUser(principal.getId(), pageable);
@@ -118,7 +118,7 @@ public class RecipesController {
     public Page<RecipeSummaryDto> getPublicRecipesEndpoint(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Recipe> recipes = recipeService.getPublicRecipes(pageable);
