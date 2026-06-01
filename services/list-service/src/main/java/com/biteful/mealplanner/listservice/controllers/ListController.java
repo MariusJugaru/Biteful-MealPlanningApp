@@ -1,11 +1,10 @@
 package com.biteful.mealplanner.listservice.controllers;
 
 import com.biteful.mealplanner.listservice.config.security.UserPrincipal;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemResponse;
-import com.biteful.mealplanner.listservice.domain.dtos.ListRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListResponse;
+import com.biteful.mealplanner.listservice.domain.dtos.*;
 import com.biteful.mealplanner.listservice.services.ListService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +28,15 @@ public class ListController {
         return listService.getMyLists(principal);
     }
 
+    @GetMapping("/{listId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ListResponse getListDataEndpoint(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable UUID listId
+    ) {
+        return listService.getListData(principal, listId);
+    }
+
     @GetMapping("/users/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<ListResponse> getListsForUserEndpoint(
@@ -40,11 +48,13 @@ public class ListController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ListResponse createListEndpoint(
+    public ResponseEntity<ListResponse> createListEndpoint(
             @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody ListRequest request
     ) {
-        return listService.createList(principal, request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(listService.createList(principal, request));
     }
 
     @PatchMapping("/{listId}")
@@ -77,12 +87,14 @@ public class ListController {
 
     @PostMapping("/{listId}/items")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ListItemResponse addItemToListEndpoint(
+    public ResponseEntity<ListItemResponse> addItemToListEndpoint(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID listId,
             @RequestBody ListItemRequest listItemRequest
     ) {
-        return listService.addItem(principal, listId, listItemRequest);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(listService.addItem(principal, listId, listItemRequest));
     }
 
     @PutMapping("/{listId}/items/{itemId}")
@@ -105,4 +117,16 @@ public class ListController {
     ) {
         listService.deleteItem(principal, listId, itemId);
     }
+
+    @PatchMapping("/{listId}/items/{itemId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ListItemResponse updateCheckedEndpoint(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable UUID listId,
+            @PathVariable Long itemId,
+            @RequestBody UpdateCheckedRequest updateCheckedRequest
+    ) {
+        return listService.updateChecked(principal, listId, itemId, updateCheckedRequest);
+    }
+
 }

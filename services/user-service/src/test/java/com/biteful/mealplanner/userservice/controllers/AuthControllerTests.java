@@ -52,7 +52,6 @@ public class AuthControllerTests {
     public void testThatUserCanBeRegisteredAndReturns201Created() throws Exception {
         UserCreateRequestDto requestDto = TestDataUtil.createRequestDtoA();
 
-
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)

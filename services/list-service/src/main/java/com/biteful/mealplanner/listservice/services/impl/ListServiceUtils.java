@@ -15,6 +15,7 @@ public class ListServiceUtils {
                 .name(listItemEntity.getName())
                 .quantity(listItemEntity.getQuantity())
                 .unit(listItemEntity.getUnit())
+                .checked(listItemEntity.getChecked())
                 .build();
     }
 
@@ -29,6 +30,12 @@ public class ListServiceUtils {
     static void validateListAccess(UserPrincipal userPrincipal, ListEntity listEntity) {
         if (!listEntity.getUserId().equals(userPrincipal.getId())
                 && !userPrincipal.getRole().equalsIgnoreCase("ADMIN")) {
+            throw new AccessDeniedException("Insufficient permissions");
+        }
+    }
+
+    static void validateItemInList(ListItemEntity listItemEntity, ListEntity listEntity) {
+        if (!listItemEntity.getShoppingList().getId().equals(listEntity.getId())) {
             throw new AccessDeniedException("Insufficient permissions");
         }
     }

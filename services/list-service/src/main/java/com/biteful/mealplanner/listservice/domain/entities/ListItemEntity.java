@@ -27,4 +27,6 @@ public class ListItemEntity {
 
     private Double quantity;
     private String unit;
+
+    private Boolean checked;
 }

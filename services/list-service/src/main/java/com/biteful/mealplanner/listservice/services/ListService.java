@@ -1,10 +1,7 @@
 package com.biteful.mealplanner.listservice.services;
 
 import com.biteful.mealplanner.listservice.config.security.UserPrincipal;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemResponse;
-import com.biteful.mealplanner.listservice.domain.dtos.ListRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListResponse;
+import com.biteful.mealplanner.listservice.domain.dtos.*;
 import com.biteful.mealplanner.listservice.domain.entities.ListEntity;
 import com.biteful.mealplanner.listservice.domain.entities.ListItemEntity;
 
@@ -22,6 +19,9 @@ public interface ListService {
     // Returns all the lists of a user
     List<ListResponse> getListsForUser(UserPrincipal userPrincipal, UUID userId);
 
+    // Returns the list
+    ListResponse getListData(UserPrincipal userPrincipal, UUID listId);
+
     // Updates the name of a list
     ListResponse updateList(UserPrincipal userPrincipal, UUID listId, ListRequest listRequest);
 
@@ -38,4 +38,6 @@ public interface ListService {
     ListItemResponse updateItem(UserPrincipal userPrincipal, UUID listId, Long itemId, ListItemRequest listItemRequest);
 
     void deleteItem(UserPrincipal userPrincipal, UUID listId, Long itemId);
+
+    ListItemResponse updateChecked(UserPrincipal userPrincipal, UUID listId, Long itemId, UpdateCheckedRequest checkedRequest);
 }

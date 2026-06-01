@@ -1,16 +1,14 @@
 package com.biteful.mealplanner.listservice.services.impl;
 
 import com.biteful.mealplanner.listservice.config.security.UserPrincipal;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListItemResponse;
-import com.biteful.mealplanner.listservice.domain.dtos.ListRequest;
-import com.biteful.mealplanner.listservice.domain.dtos.ListResponse;
+import com.biteful.mealplanner.listservice.domain.dtos.*;
 import com.biteful.mealplanner.listservice.domain.entities.ListEntity;
 import com.biteful.mealplanner.listservice.domain.entities.ListItemEntity;
 import com.biteful.mealplanner.listservice.repositories.ListItemRepository;
 import com.biteful.mealplanner.listservice.repositories.ListRepository;
 import com.biteful.mealplanner.listservice.services.ListService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class ListServiceImpl implements ListService {
     @Override
     public List<ListResponse> getListsForUser(UserPrincipal userPrincipal, UUID userId) {
         if (!userPrincipal.getRole().equalsIgnoreCase("ADMIN")) {
-            throw new RuntimeException("Insufficient permissions!");
+            throw new AccessDeniedException("Insufficient permissions");
         }
 
         List<ListEntity> entities = listRepository.findAllByUserId(userId);
@@ -68,6 +66,16 @@ public class ListServiceImpl implements ListService {
         }
 
         return responses;
+    }
+
+    @Override
+    public ListResponse getListData(UserPrincipal userPrincipal, UUID listId) {
+        ListEntity listEntity = listRepository.findById(listId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping list not found: " + listId));
+
+        ListServiceUtils.validateListAccess(userPrincipal, listEntity);
+
+        return ListServiceUtils.toResponse(listEntity);
     }
 
     @Override
@@ -105,6 +113,7 @@ public class ListServiceImpl implements ListService {
                 .name(listItemRequest.getName())
                 .unit(listItemRequest.getUnit())
                 .quantity(listItemRequest.getQuantity())
+                .checked(false)
                 .build();
         listItemEntity = listItemRepository.save(listItemEntity);
 
@@ -139,6 +148,7 @@ public class ListServiceImpl implements ListService {
                 .orElseThrow(() -> new EntityNotFoundException("Shopping list item not found: " + itemId));
 
         ListServiceUtils.validateListAccess(userPrincipal, listEntity);
+        ListServiceUtils.validateItemInList(listItemEntity, listEntity);
 
         listItemEntity.setName(listItemRequest.getName());
         listItemEntity.setQuantity(listItemRequest.getQuantity());
@@ -158,7 +168,26 @@ public class ListServiceImpl implements ListService {
                 .orElseThrow(() -> new EntityNotFoundException("Shopping list item not found: " + itemId));
 
         ListServiceUtils.validateListAccess(userPrincipal, listEntity);
+        ListServiceUtils.validateItemInList(listItemEntity, listEntity);
 
         listItemRepository.delete(listItemEntity);
+    }
+
+    @Override
+    public ListItemResponse updateChecked(UserPrincipal userPrincipal, UUID listId, Long itemId, UpdateCheckedRequest checkedRequest) {
+        ListEntity listEntity = listRepository.findById(listId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping list not found: " + listId));
+
+        ListItemEntity listItemEntity = listItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping list item not found: " + itemId));
+
+        ListServiceUtils.validateListAccess(userPrincipal, listEntity);
+        ListServiceUtils.validateItemInList(listItemEntity, listEntity);
+
+        listItemEntity.setChecked(checkedRequest.getChecked());
+
+        listItemEntity = listItemRepository.save(listItemEntity);
+
+        return ListServiceUtils.toResponse(listItemEntity);
     }
 }

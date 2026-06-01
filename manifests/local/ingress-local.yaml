@@ -68,3 +68,11 @@ spec:
                 name: recipe-service
                 port:
                   number: 80
+
+          - path: /api/lists
+            pathType: Prefix
+            backend:
+              service:
+                name: list-service
+                port:
+                  number: 80

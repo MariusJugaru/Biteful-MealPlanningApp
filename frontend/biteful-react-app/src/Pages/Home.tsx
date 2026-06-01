@@ -88,7 +88,7 @@ function Home() {
         loadMeals();
     }, [startDate, endDate]);
 
-        // Generate meal plan modal
+    // Generate meal plan modal
     const [generatePlanModal, setGeneratePlanModal] = useState<{
         open: boolean;
     }>({
