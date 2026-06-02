@@ -2,6 +2,7 @@ package com.biteful.mealplanner.recipeservice.controllers;
 
 
 import com.biteful.mealplanner.recipeservice.config.security.UserPrincipal;
+import com.biteful.mealplanner.recipeservice.domain.dto.RecipeDto;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealPlanItem;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealResponse;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.UserPreferences;
@@ -81,5 +82,15 @@ public class MealPlansController {
             @RequestBody List<MealPlanItem> meals
     ) {
         mealPlanService.savePlan(principal.getId(), meals);
+    }
+
+    @GetMapping("/recipes")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public List<RecipeDto> getRecipesInRange(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end
+    ) {
+        return mealPlanService.getRecipesInRange(principal.getId(), start, end);
     }
 }

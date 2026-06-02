@@ -1,5 +1,6 @@
 package com.biteful.mealplanner.recipeservice.services;
 
+import com.biteful.mealplanner.recipeservice.domain.dto.RecipeDto;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealPlanItem;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealResponse;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.UserPreferences;
@@ -20,4 +21,6 @@ public interface MealPlanService {
     public List<MealResponse> generatePlan(UUID userId, UserPreferences preferences);
 
     public void savePlan(UUID userId, List<MealPlanItem> meals);
+
+    public List<RecipeDto> getRecipesInRange(UUID userId, LocalDate startDate, LocalDate endDate);
 }

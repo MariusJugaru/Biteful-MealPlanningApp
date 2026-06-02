@@ -296,7 +296,7 @@ function Home() {
                             </div>
                             <div className="rounded-md border px-2 py-1 text-xs font-semibold cursor-default">{startDate} - {endDate}</div>
                             <div
-                                className="rounded-md border p-1.5 hover:bg-[#ececec] active:bg-[#dbdbdb] transition cursor-pointer"
+                                className="rounded-md border p-1.5 hover:bg-[#ececec] active:bg-[#dbdbdb] transition"
                                 onClick={nextWeek}
                             >
                                 <ChevronRight className="w-4 h-4" />

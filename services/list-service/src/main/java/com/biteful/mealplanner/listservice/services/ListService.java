@@ -31,6 +31,9 @@ public interface ListService {
     // Adds an item to a list
     ListItemResponse addItem(UserPrincipal userPrincipal, UUID listId, ListItemRequest listItemRequest);
 
+    // Add items
+    List<ListItemResponse> addItems(UserPrincipal userPrincipal, UUID listId, List<ListItemRequest> listItemsRequest);
+
     // Returns a list
     List<ListItemResponse> getList(UserPrincipal userPrincipal, UUID listId);
 

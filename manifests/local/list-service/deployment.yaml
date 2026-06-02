@@ -35,6 +35,9 @@ spec:
             - name: JWT_SECRET
               value: mySuperSecretKeyThatIsLongEnough12345
 
+            - name: API_URL
+              value: http://recipe-service
+
           resources:
             requests:
               memory: "256Mi"

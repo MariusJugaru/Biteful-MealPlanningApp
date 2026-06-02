@@ -121,6 +121,31 @@ public class ListServiceImpl implements ListService {
     }
 
     @Override
+    public List<ListItemResponse> addItems(UserPrincipal userPrincipal, UUID listId, List<ListItemRequest> listItemsRequest) {
+        ListEntity listEntity = listRepository.findById(listId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping list not found: " + listId));
+
+        ListServiceUtils.validateListAccess(userPrincipal, listEntity);
+
+        List<ListItemEntity> entities = new ArrayList<>();
+        for (ListItemRequest item : listItemsRequest) {
+            entities.add(ListItemEntity.builder()
+                    .shoppingList(listEntity)
+                    .name(item.getName())
+                    .unit(item.getUnit())
+                    .quantity(item.getQuantity())
+                    .checked(false)
+                    .build());
+        }
+
+        List<ListItemEntity> saved = listItemRepository.saveAll(entities);
+
+        return saved.stream()
+                .map(ListServiceUtils::toResponse)
+                .toList();
+    }
+
+    @Override
     public List<ListItemResponse> getList(UserPrincipal userPrincipal, UUID listId) {
         ListEntity listEntity = listRepository.findById(listId)
                 .orElseThrow(() -> new EntityNotFoundException("Shopping list not found: " + listId));

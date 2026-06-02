@@ -117,7 +117,7 @@ function GeneratePlanModal({ open, onClose, onGenerated } : GeneratePlanProps) {
                 </div>
 
                 {/* Scroll */}
-                <div className="flex-1 overflow-y-auto text-center w-full-2 lg:max-h-[75vh] ml-2">
+                <div className="flex-1 overflow-y-auto text-center w-full-2 max-h-[75vh] ml-2">
 
                     <div className="px-4 mb-6">
                         <div className="border rounded-md mb-5">
@@ -126,7 +126,7 @@ function GeneratePlanModal({ open, onClose, onGenerated } : GeneratePlanProps) {
                                 ranges={range}
                                 onChange={(item: any) => setRange([item.selection])}
                                 moveRangeOnFirstSelection={false}
-                                months={2}
+                                months={isMobile ? 1 : 2}
                                 direction="horizontal"
                                 className="py-5"
                             />

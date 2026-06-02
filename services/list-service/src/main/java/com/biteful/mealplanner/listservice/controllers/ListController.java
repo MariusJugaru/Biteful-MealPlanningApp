@@ -2,6 +2,7 @@ package com.biteful.mealplanner.listservice.controllers;
 
 import com.biteful.mealplanner.listservice.config.security.UserPrincipal;
 import com.biteful.mealplanner.listservice.domain.dtos.*;
+import com.biteful.mealplanner.listservice.services.ListGenerationService;
 import com.biteful.mealplanner.listservice.services.ListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,10 +18,12 @@ import java.util.UUID;
 @RequestMapping("/api/lists")
 public class ListController {
 
-    public final ListService listService;
+    private final ListService listService;
+    private final ListGenerationService listGenerationService;
 
-    public ListController(ListService listService) {
+    public ListController(ListService listService, ListGenerationService listGenerationService) {
         this.listService = listService;
+        this.listGenerationService = listGenerationService;
     }
 
     @GetMapping
@@ -129,4 +133,18 @@ public class ListController {
         return listService.updateChecked(principal, listId, itemId, updateCheckedRequest);
     }
 
+    @PostMapping("/generate")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ListResponse generatePlanList(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody GenerateListRequest generateListRequest
+    ) {
+        return listGenerationService.generate(
+                principal,
+                authorizationHeader,
+                generateListRequest.getStart(),
+                generateListRequest.getEnd(),
+                generateListRequest.getTitle());
+    }
 }

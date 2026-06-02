@@ -8,6 +8,7 @@ import useFetch from "../Hooks/useFetch";
 import type { Recipe } from "../types/recipe";
 import TagComponent from "../Components/TagComponent";
 import { config } from "../config";
+import { useEffect, useState } from "react";
 
 export type Ingredient = {
     name: string;
@@ -64,6 +65,28 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
 
         navigate(`/saved/${data.id}`);
     }
+
+    const baseServings = data?.servings && data.servings > 0 ? data.servings : 1;
+    const [servings, setServings] = useState(data?.servings ?? 0);
+
+    useEffect(() => {
+        if (data?.servings != null) {
+            setServings(data?.servings === 0 ? 1 : data?.servings);
+        }
+    }, [data]);
+
+    const scale = baseServings > 0 ? servings / baseServings : 1;
+
+    const scaledIngredients = data?.ingredients.map((ing) => ({
+        ...ing,
+        quantity: ing.quantity * scale,
+    }));
+
+    const formatQuantity = (qty: number) => {
+        return Number.isInteger(qty)
+            ? qty
+            : Number(qty.toFixed(2));
+    };
 
     if (loading) return <p>Loading</p>;
     if (error) return <p>{error}</p>
@@ -157,10 +180,16 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
                         )}
 
                         {/* Stats */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                             <InfoCard text="Prep" val={`${data.prepTime ?? 0} min`} icon={Clock} color="#030213"/>
                             <InfoCard text="Cook" val={`${data.cookTime ?? 0} min`} icon={ChefHat} color="#ffa600"/>
-                            <InfoCard text="Servings" val={`${data.servings ?? 0}`} icon={Users} color="#00ff2f"/>
+                            <InfoCard text="Servings" 
+                                val={`${servings}`}
+                                icon={Users}
+                                color="#00ff2f"
+                                onIncrease={() => setServings(s => s + 1)}
+                                onDecrease={() => setServings(s => Math.max(1, s - 1))}
+                            />
                             <InfoCard text="Calories" val={`${data.calories ?? 0}`} icon={Flame} color="#ff0d00"/>
                         </div>
                         
@@ -173,7 +202,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
                             
                             <div className="bg-[#eeeeee] rounded-lg p-6">
                                 <ul className="space-y-3">
-                                    {data.ingredients.map((ingredient, index) => (
+                                    {scaledIngredients?.map((ingredient, index) => (
                                         <li
                                             key={index}
                                             className="flex items-start gap-3 p-3 rounded-md hover:bg-[#ffffff] transition-colors"
@@ -182,7 +211,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
                                             <div className="flex-1">
                                                 <span className="font-medium">{ingredient.name}</span>
                                                 <span className="text-[#717182] ml-2">
-                                                    {ingredient.quantity && "-"} {ingredient.quantity} {ingredient.unit}
+                                                    {(ingredient.quantity > 0 || ingredient.unit !== "") && "-"} {ingredient.quantity > 0 && formatQuantity(ingredient.quantity)} {ingredient.unit && ingredient.unit}
                                                 </span>
                                             </div>
                                         </li>

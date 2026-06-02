@@ -3,9 +3,9 @@ import RecipeCard from "../Components/RecipeCard";
 import NavButton from "../Components/NavButton";
 import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
-import { ArrowLeft, ListPlus, Plus, Trash, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, ListPlus, Plus, Trash, Trash2, X } from "lucide-react";
 import AiRecipeModal from "../Components/AiRecipeModal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddListModal from "../Components/AddListModal";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -30,6 +30,8 @@ function savedList() {
     const { listId } = useParams<{ listId: string }>();
 
     const navigate = useNavigate();
+
+    const nameInputRef = useRef<HTMLInputElement>(null);
 
     const token = localStorage.getItem("token");
     
@@ -72,28 +74,39 @@ function savedList() {
         }
     }, [itemsData]);
 
-    async function savedList(title: string) {
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [title, setTitle] = useState("");
 
-        const response = await fetch(`${config.apiUrl}/api/lists`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                title: title
-            }),
-        });
+    async function saveTitle() {
+    const response = await fetch(
+        `${config.apiUrl}/api/lists/${listId}`,
+            {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: title
+                }),
+            }
+        );
+
+        setEditingTitle(false);
 
         if (!response.ok) {
-            console.error("Add meal failed");
+            console.error("Update title failed");
             return;
         }
 
-        const newList: List = await response.json();
-
-        // setLists(prev => [...prev, newList]);
+        
     }
+
+    useEffect(() => {
+        if (listData?.title) {
+            setTitle(listData.title);
+        }
+    }, [listData]);
 
     const [name, setName] = useState("");
     const [qty, setQty] = useState<number>(0);
@@ -102,31 +115,63 @@ function savedList() {
     async function handleAdd() {
         if (!name.trim()) return;
 
-        const response = await fetch(`${config.apiUrl}/api/lists/${listId}/items`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name: name,
-                quantity: qty,
-                unit: unit
-            }),
-        });
+        const tempId = Date.now();
 
-        if (!response.ok) {
-            console.error("Add meal failed");
-            return;
-        }
+        const optimisticItem: ListItem = {
+            id: tempId,
+            shoppingListId: listId || "",
+            name,
+            quantity: qty,
+            unit,
+            checked: false
+        };
 
-        const newItem: ListItem = await response.json();
-
-        setListItems(prev => [...prev, newItem]);
+        setListItems(prev => [...prev, optimisticItem]);
 
         setName("");
         setQty(0);
         setUnit("");
+
+        nameInputRef.current?.focus();
+
+        try {
+            const response = await fetch(
+                `${config.apiUrl}/api/lists/${listId}/items`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name,
+                        quantity: qty,
+                        unit
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Add failed");
+            }
+
+            const savedItem: ListItem = await response.json();
+
+            setListItems(prev =>
+                prev.map(item =>
+                    item.id === tempId
+                        ? savedItem
+                        : item
+                )
+            );
+
+        } catch (err) {
+            console.error(err);
+
+            setListItems(prev =>
+                prev.filter(item => item.id !== tempId)
+            );
+        }
     }
 
     async function onToggleItem(id: number, currentChecked: boolean) {
@@ -199,7 +244,12 @@ function savedList() {
     }
 
     async function onDeleteList () {
-        console.log("listId =", listId);
+
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this shopping list? This action cannot be undone."
+        );
+
+        if (!confirmed) return;
 
         const response = await fetch(
                 `${config.apiUrl}/api/lists/${listId}`,
@@ -230,12 +280,8 @@ function savedList() {
     return(
         <>
             <Header />
-  
-            
-            
-            <div className="mx-auto px-6 py-6 select-none">
-                
 
+            <div className="mx-auto px-6 py-6 select-none">
                 {/* In page header */}
                 <div className="flex justify-between items-center">
                     <h3 className="flex items-center gap-4">
@@ -244,7 +290,42 @@ function savedList() {
                                 <ArrowLeft className="w-4 h-4" />
                             </NavButton>
                         </div>
-                        {listData?.title}
+
+                        {/* Title */}
+                        {editingTitle ? (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        saveTitle();
+                                    }}}
+                                    className="border px-2 py-1 rounded text-sm"
+                                    autoFocus
+                                />
+
+                                <button 
+                                    onClick={saveTitle}
+                                >
+                                    <Check />
+                                </button>
+
+                                <button onClick={() => {
+                                    setEditingTitle(false);
+                                    setTitle(listData?.title || "");
+                                }}>
+                                    <X />
+                                </button>
+                            </div>
+                        ) : (
+                            <span
+                                className="cursor-pointer"
+                                onClick={() => setEditingTitle(true)}
+                            >
+                                {title}
+                            </span>
+                        )}
                         <span className="px-2 py-1 bg-gray-100 rounded-xl border text-xs">
                             {listItems.length} item{listItems.length > 1 && "s"}
                         </span>
@@ -266,10 +347,16 @@ function savedList() {
                         {/* ADD ITEM */}
                         <div className="px-5 mt-5 rounded-md flex gap-2 ">
                             <input
+                                ref={nameInputRef}
                                 className="border p-2 flex-1 rounded bg-gray-100 text-gray-800"
                                 placeholder="Item"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleAdd();
+                                    }
+                                }}
                             />
 
                             <input
@@ -278,6 +365,11 @@ function savedList() {
                                 placeholder="0"
                                 value={qty}
                                 onChange={(e) => setQty(Number(e.target.value))}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleAdd();
+                                    }
+                                }}
                             />
 
                             <input
@@ -285,6 +377,11 @@ function savedList() {
                                 placeholder="g"
                                 value={unit}
                                 onChange={(e) => setUnit(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleAdd();
+                                    }
+                                }}
                             />
 
                             <button

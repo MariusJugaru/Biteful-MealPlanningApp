@@ -8,6 +8,8 @@ type CardProps = {
 
     editable?: boolean;
     onChange?: (value: number) => void;
+    onIncrease?: () => void;
+    onDecrease?: () => void;
 }
 
 function InfoCard({
@@ -17,6 +19,9 @@ function InfoCard({
     color = "bg-white",
     editable = false,
     onChange,
+    
+    onIncrease,
+    onDecrease
 }: CardProps) {
     return(
         <div 
@@ -24,29 +29,50 @@ function InfoCard({
                 backgroundColor: `${color}10`,
                 borderColor: `${color}20`,
             }}
-            className="flex items-center gap-3 p-4 rounded-lg border"
+            className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 p-4 rounded-lg border w-full"
         >
-            <div
-                style={{ backgroundColor: `${color}10` }}
-                className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center"
-            >
-                <Icon className="w-5 h-5" style={{ color }} />
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div
+                    style={{ backgroundColor: `${color}10` }}
+                    className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center"
+                >
+                    <Icon className="w-5 h-5" style={{ color }} />
+                </div>
+                
+                <div>
+                    <p className="text-xs text-[#717182]">{text}</p>
+
+                    {editable ? (
+                        <input
+                            type="number"
+                            value={val}
+                            onChange={(e) => onChange?.(Number(e.target.value))}
+                            className="font-semibold bg-transparent outline-none w-full border-b border-[#000000]"
+                        />
+                    ) : (
+                        <p className="font-semibold">{val}</p>
+                    )}
+
+                </div>
             </div>
             
-            <div>
-                <p className="text-xs text-[#717182]">{text}</p>
-
-                {editable ? (
-                    <input
-                        type="number"
-                        value={val}
-                        onChange={(e) => onChange?.(Number(e.target.value))}
-                        className="font-semibold bg-transparent outline-none w-full border-b border-[#000000]"
-                    />
-                ) : (
-                    <p className="font-semibold">{val}</p>
-                )} 
-            </div>
+            {onIncrease && (
+                <div className="flex flex-col md:flex-nowrap items-center justify-between gap-1 rounded-lg">
+                    <button
+                        onClick={onIncrease}
+                        className="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
+                    >
+                        +
+                    </button>
+                    
+                    <button
+                        onClick={onDecrease}
+                        className="w-8 h-8 flex items-center justify-center border rounded-md hover:bg-gray-100"
+                    >
+                        -
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

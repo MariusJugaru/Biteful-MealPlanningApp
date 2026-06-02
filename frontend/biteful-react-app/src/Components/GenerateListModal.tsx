@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
 import RecipeCard from "./RecipeCard";
+import { DateRange } from "react-date-range";
 
 
 type AddListProps = {
     open: boolean;
     onClose: () => void;
-    onAddList: (title: string) => void;
+    onAddList: (title: string, startDate: Date, endDate: Date) => void;
 }
 
 
-function AddListModal({ open, onClose, onAddList } : AddListProps) {
+function GenerateListModal({ open, onClose, onAddList } : AddListProps) {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -29,16 +30,24 @@ function AddListModal({ open, onClose, onAddList } : AddListProps) {
 
     const [title, setTitle] = useState("");
 
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: "selection",
+        },
+    ]);
+
     if (!open) return null;
 
     return(
          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             
-            <div className="bg-white w-full max-w-xl rounded-xl p-4">
+            <div className="bg-white w-fit rounded-xl p-4">
                 
                 <div className="flex justify-between items-center mb-4 px-2">
                     <h4>
-                        Create New Shopping List
+                        Generate New Shopping List
                     </h4>
 
                     <button className="" onClick={onClose}>
@@ -46,14 +55,25 @@ function AddListModal({ open, onClose, onAddList } : AddListProps) {
                     </button>
                 </div>
 
-                <div className="py-2 px-2">
-                    <h5 className="font-semibold">List Name</h5>
-                    <input 
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="p-2 mt-2 bg-[#eeeeee] rounded-md w-full"
-                        placeholder="e.g. Weekly Groceries, Party"
+                <div className="flex flex-col py-2 px-2">
+                    <div>
+                        <h5 className="font-semibold">List Name</h5>
+                        <input 
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="p-2 mt-2 bg-[#eeeeee] rounded-md w-full"
+                            placeholder="e.g. Weekly Groceries, Party"
+                        />
+                    </div>
+                    
+                    <DateRange
+                        ranges={range}
+                        onChange={(item: any) => setRange([item.selection])}
+                        moveRangeOnFirstSelection={false}
+                        months={isMobile ? 1 : 2}
+                        direction="horizontal"
+                        className="py-5 w-fit"
                     />
 
                 </div>
@@ -71,15 +91,16 @@ function AddListModal({ open, onClose, onAddList } : AddListProps) {
 
                     <button
                         onClick={() => {
-                            const finalTitle = title.trim() ? title : "My New List";
+                            const finalTitle = title.trim() ? title : "My New Generated List";
 
-                            onAddList(finalTitle);
+                            onAddList(finalTitle, range[0].startDate, range[0].endDate);
+
                             setTitle("");
                             onClose();
                         }}
                         className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                        Create List
+                        Generate List
                     </button>
                 </div>
 
@@ -89,4 +110,4 @@ function AddListModal({ open, onClose, onAddList } : AddListProps) {
     );
 }
 
-export default AddListModal;
+export default GenerateListModal;

@@ -8,6 +8,7 @@ import AiRecipeModal from "../Components/AiRecipeModal";
 import { useEffect, useState } from "react";
 import AddListModal from "../Components/AddListModal";
 import { useNavigate } from "react-router-dom";
+import GenerateListModal from "../Components/GenerateListModal";
 
 type List = {
     id: string;
@@ -46,6 +47,13 @@ function Lists() {
         open: false,
     });
 
+    // Generate List Modal
+    const [generateListModal, setGenerateListModal] = useState<{
+        open: boolean;
+    }>({
+        open: false,
+    });
+
     async function addList(title: string) {
 
         const response = await fetch(`${config.apiUrl}/api/lists`, {
@@ -69,6 +77,36 @@ function Lists() {
         setLists(prev => [...prev, newList]);
     }
 
+    async function generateList(title: string, startDate: Date, endDate: Date) {
+
+        const start = startDate.toISOString().split("T")[0];
+        const end = endDate.toISOString().split("T")[0];
+
+        console.log(start);
+
+        const response = await fetch(`${config.apiUrl}/api/lists/generate`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title: title,
+                start: start,
+                end: end
+            })
+        });
+
+        if (!response.ok) {
+            console.error("Generate meal failed");
+            return;
+        }
+
+        const newList: List = await response.json();
+
+        setLists(prev => [...prev, newList]);
+    }
+
     if (error) {
         return <div>{error}</div>;
     }
@@ -83,7 +121,7 @@ function Lists() {
                     <h3>Shopping Lists</h3>
 
                     <button
-                        onClick={() => setCreateListModal({ open: true })}
+                        onClick={() => setGenerateListModal({ open: true })}
                         className="flex items-center gap-2 bg-white border rounded-md px-3 py-2 rounded-md text-sm font-medium"
                     >
                         Generate from Meal Plan
@@ -129,6 +167,14 @@ function Lists() {
                     setCreateListModal({open: false})
                 }
                 onAddList={(title) => addList(title)}
+            />
+
+            <GenerateListModal
+                open={generateListModal.open}
+                onClose={() => 
+                    setGenerateListModal({open: false})
+                }
+                onAddList={(title, startDate, endDate) => generateList(title, startDate, endDate)}
             />
         </>
     );

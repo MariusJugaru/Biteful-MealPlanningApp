@@ -1,16 +1,22 @@
 package com.biteful.mealplanner.recipeservice.services.impl;
 
 import com.biteful.mealplanner.recipeservice.domain.documents.Recipe;
+import com.biteful.mealplanner.recipeservice.domain.dto.RecipeDto;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealPlanItem;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.MealResponse;
 import com.biteful.mealplanner.recipeservice.domain.dto.mealplans.UserPreferences;
 import com.biteful.mealplanner.recipeservice.domain.entities.MealPlanEntity;
 import com.biteful.mealplanner.recipeservice.domain.entities.MealPlanId;
 import com.biteful.mealplanner.recipeservice.domain.entities.MealType;
+import com.biteful.mealplanner.recipeservice.mappers.impl.RecipeDtoMapper;
 import com.biteful.mealplanner.recipeservice.repositories.MealPlanRepository;
 import com.biteful.mealplanner.recipeservice.repositories.RecipeRepositoryCustom;
 import com.biteful.mealplanner.recipeservice.services.MealPlanService;
 import com.biteful.mealplanner.recipeservice.services.RecipeService;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -265,5 +271,33 @@ public class MealPlanServiceImpl implements MealPlanService {
 
             mealPlanRepository.save(entity);
         }
+    }
+
+    @Override
+    public List<RecipeDto> getRecipesInRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        List<MealResponse> meals = getMealsInRange(userId, startDate, endDate);
+
+        List<String> recipeIds = new ArrayList<>();
+
+        for (MealResponse meal : meals) {
+            recipeIds.add(meal.getRecipeId());
+        }
+
+        List<Recipe> recipes = recipeService.getRecipesByIds(recipeIds.stream().distinct().toList());
+
+        Map<String, Recipe> recipeMap = new HashMap<>();
+        for (Recipe recipe : recipes) {
+            recipeMap.put(recipe.getId(), recipe);
+        }
+
+        List<RecipeDto> recipesResponse = new ArrayList<>();
+        RecipeDtoMapper mapper = new RecipeDtoMapper();
+        for (String recipeId : recipeIds) {
+            recipesResponse.add(
+                    mapper.mapTo(recipeMap.get(recipeId))
+            );
+        }
+
+        return recipesResponse;
     }
 }
