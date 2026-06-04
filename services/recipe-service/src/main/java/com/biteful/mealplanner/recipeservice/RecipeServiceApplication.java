@@ -13,11 +13,11 @@ public class RecipeServiceApplication {
 		SpringApplication.run(RecipeServiceApplication.class, args);
 	}
 
-    @Bean
-    CommandLineRunner init(MongoTemplate mongoTemplate) {
-        return args -> {
-            mongoTemplate.dropCollection("recipes");
-        };
-    }
+//    @Bean
+//    CommandLineRunner init(MongoTemplate mongoTemplate) {
+//        return args -> {
+//            mongoTemplate.dropCollection("recipes");
+//        };
+//    }
 
 }

@@ -169,7 +169,7 @@ public class RecipesController {
     }
 
     // Deletes a recipe.
-    @DeleteMapping("/me/{recipeId}")
+    @DeleteMapping("/{recipeId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteMyRecipe(
             @AuthenticationPrincipal UserPrincipal principal,

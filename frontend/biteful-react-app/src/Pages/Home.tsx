@@ -338,7 +338,7 @@ function Home() {
                     
                 </div>
 
-                <div className="hidden lg:grid lg:grid-cols-7 gap-4">
+                <div className="lg:grid lg:grid-cols-7 gap-4">
                     {/* Load Meals */}
                     {dates.map(day => (
                         <div

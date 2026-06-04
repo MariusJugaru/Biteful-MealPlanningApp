@@ -1,10 +1,14 @@
 import { UtensilsCrossed, Home, CookingPot, LucideScrollText, Bookmark, User2 } from "lucide-react";
 import NavButton from "./NavButton";
+import isAdmin from "../Helpers/IsAdmin";
+
 
 function Header() {
+    const token = localStorage.getItem("token");
+
     return(
-        <header className="border-b sticky top-0 bg-[#ffffff] z-50">
-            <div className="mx-auto px-6 py-4">
+        <header className="mx-auto border-b sticky top-0 bg-[#ffffff] z-50">
+            <div className="px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <NavButton to="/">
@@ -31,10 +35,13 @@ function Header() {
                             <LucideScrollText className="w-5 h-5"></LucideScrollText>
                             Lists
                         </NavButton>
-                        <NavButton to="/settings">
-                            <User2 className="w-5 h-5"></User2>
-                            Profile
-                        </NavButton>
+                        {isAdmin(token) && (
+                            <NavButton to="/users">
+                                <User2 className="w-5 h-5"></User2>
+                                Users
+                            </NavButton>
+                        )}
+                        
                     </nav>
                 </div>
             </div>

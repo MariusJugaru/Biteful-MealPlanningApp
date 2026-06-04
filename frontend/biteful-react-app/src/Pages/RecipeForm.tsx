@@ -13,7 +13,9 @@ import { useLocation } from "react-router-dom";
 
 function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const { id } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
+
     const [recipe, setRecipe] = useState<Recipe>({
         title: "",
         description: "",
@@ -29,6 +31,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         createdAt: null,
         updatedAt: null
     });
+
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -36,7 +39,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const isEdit = mode === "edit" && id;
     
     const { data, loading, error } = useFetch<Recipe>(
-        isEdit ? `${config.apiUrl}/api/recipes/me/${id}` : null,
+        isEdit ? `${config.apiUrl}/api/recipes/${id}` : null,
         {
             method: "GET",
             headers: {
@@ -46,8 +49,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         }
     );
 
-    const location = useLocation();
-
+    // Complete the form with the AI generated recipe.
     useEffect(() => {
         if (location.state?.aiRecipe && !isEdit) {
             setRecipe(location.state.aiRecipe);
@@ -62,6 +64,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         }
     }, [isEdit, data]);
 
+    // Returns the image that needs to be shown. Preview image has priority.
     const getImageSrc = () => {
         if (imagePreview) return imagePreview;
 
@@ -96,39 +99,57 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         });
     };
 
+    const addIngredient = () => {
+        setRecipe({
+            ...recipe,
+            ingredients: [...recipe.ingredients, { name: "", quantity: 0, unit: "" }],
+        });
+    };
+
     const updateIngredient = (index: number, field: keyof Ingredient, value: any) => {
         const updated = [...recipe.ingredients];
         updated[index] = { ...updated[index], [field]: value };
-        setRecipe({ ...recipe, ingredients: updated });
-    };
-
-    const addIngredient = () => {
+        
         setRecipe({
-        ...recipe,
-        ingredients: [...recipe.ingredients, { name: "", quantity: 0, unit: "" }],
+            ...recipe,
+            ingredients: updated
         });
     };
 
     const removeIngredient = (index: number) => {
         const updated = recipe.ingredients.filter((_, i) => i !== index);
-        setRecipe({ ...recipe, ingredients: updated });
+        
+        setRecipe({
+            ...recipe,
+            ingredients: updated
+        });
     };
 
     const handleSubmit = async () => {
         const token = localStorage.getItem("token");
 
-        const method = isEdit ? "PUT" : "POST";
+        // Remove invalid ingredients (ingredients with no name)
+        const cleanIngredients = recipe.ingredients.filter(ing =>
+            ing.name.trim() !== ""
+        );
+
+        const payload = {
+            ...recipe,
+            ingredients: cleanIngredients,
+        };
 
         const formData = new FormData();
 
         formData.append(
             "recipe",
-            new Blob([JSON.stringify(recipe)], { type: "application/json" })
+            new Blob([JSON.stringify(payload)], { type: "application/json" })
         );
 
         if (imageFile) {
             formData.append("image", imageFile);
         }
+
+        const method = isEdit ? "PUT" : "POST";
 
         const url = isEdit
             ? `${config.apiUrl}/api/recipes/me/${id}`

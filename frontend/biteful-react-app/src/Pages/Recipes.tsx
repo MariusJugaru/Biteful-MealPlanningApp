@@ -1,11 +1,12 @@
 import Header from "../Components/Header";
 import RecipeCard from "../Components/RecipeCard";
 import NavButton from "../Components/NavButton";
-import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
 import { Sparkles } from "lucide-react";
 import AiRecipeModal from "../Components/AiRecipeModal";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { useLocation } from "react-router-dom";
 
 type Recipe = {
     id: string;
@@ -26,21 +27,100 @@ function Recipes({ mode = "saved" } : { mode?: "saved" | "public"}) {
         mode === "saved"
             ? "/api/recipes/me"
             : "/api/recipes/public";
-    
-    const { data, loading, error } = useFetch<ApiResponse>(
-        `${config.apiUrl}${api}`,
-        {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        }
-    )
 
-    if (error) {
-        return <div>{error}</div>;
-    }
+    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    const observerRef = useRef<HTMLDivElement>(null);
+    
+    const fetchingRef = useRef(false);
+    const location = useLocation();
+
+    const [resetKey, setResetKey] = useState(0);
+
+    useEffect(() => {
+        setRecipes([]);
+        setPage(0);
+        setHasMore(true);
+        fetchingRef.current = false;
+        setResetKey(k => k + 1);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        async function loadRecipes() {
+            if (!hasMore || fetchingRef.current) return;
+
+            fetchingRef.current = true;
+            setLoading(true);
+
+            try {
+                const response = await fetch(
+                    `${config.apiUrl}${api}?page=${page}&size=18`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const data: ApiResponse = await response.json();
+
+                setRecipes(prev => {
+                    const existingIds = new Set(prev.map(r => r.id));
+
+                    const filtered = data.content.filter(
+                        r => !existingIds.has(r.id)
+                    );
+
+                    return [...prev, ...filtered];
+                });
+
+                if (data.content.length < 18) {
+                    setHasMore(false);
+                }
+
+            } finally {
+                fetchingRef.current = false;
+                setLoading(false);
+            }
+        }
+
+        loadRecipes();
+    }, [page, api, resetKey]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (
+                    entries[0].isIntersecting &&
+                    hasMore &&
+                    !fetchingRef.current
+                ) {
+                    setPage(prev => prev + 1);
+                }
+            },
+            {
+                rootMargin: "300px",
+                threshold: 0,
+            }
+        );
+
+        const current = observerRef.current;
+
+        if (current) {
+            observer.observe(current);
+        }
+
+        return () => {
+            if (current) {
+                observer.unobserve(current);
+            }
+        };
+
+    }, [hasMore]);
 
     return(
         <>
@@ -69,24 +149,24 @@ function Recipes({ mode = "saved" } : { mode?: "saved" | "public"}) {
                         </div>
                     )}
                 </div>
-                
-                {loading ? (
-                    <p>Loading...</p>
-                ) : (
-                    // Recipe cards
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-6">
-                        {data?.content?.map((recipe) => (
-                            <RecipeCard key={recipe.id} recipe={recipe} mode={mode} />
-                        ))}
-                    </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-6">
+                    {recipes.map(recipe => (
+                        <RecipeCard
+                            key={recipe.id}
+                            recipe={recipe}
+                            mode={mode}
+                        />
+                    ))}
+                </div>
+                <div ref={observerRef} className="h-10" />
+
+                {loading && (
+                    <p className="text-center py-4">
+                        Loading more recipes...
+                    </p>
                 )}
             </div>
- 
-            {/* {!loading &&
-                <pre className="whitespace-pre-wrap break-words max-w-full">
-                    {JSON.stringify(data.content, null, 2)}
-                </pre>
-            } */}
             
             <AiRecipeModal
                 open={aiOpen}

@@ -9,6 +9,7 @@ import type { Recipe } from "../types/recipe";
 import TagComponent from "../Components/TagComponent";
 import { config } from "../config";
 import { useEffect, useState } from "react";
+import isAdmin from "../Helpers/IsAdmin";
 
 export type Ingredient = {
     name: string;
@@ -27,7 +28,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
 
     const token = localStorage.getItem("token");
     const { data, loading, error } = useFetch<Recipe>(
-        `${config.apiUrl}${api}${id}`,
+        `${config.apiUrl}/api/recipes/${id}`,
         {
             method: "GET",
             headers: {
@@ -41,7 +42,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
         if (!id) return;
         if (!confirm("Are you sure you want to delete the recipe?")) return;
 
-        await fetch(`${config.apiUrl}/api/recipes/me/${id}`, {
+        await fetch(`${config.apiUrl}/api/recipes/${id}`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -96,7 +97,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
         <>
             <Header />
             <div className="min-h-screen bg-[#ffffff] pb-8 lg:px-24">
-                
+
                 {/* Header with return button */}
                 <div className="sticky top-0 z-10 bg-[#ffffff] border-b">
                     <div className="flex items-center justify-between px-4 py-2">
@@ -133,10 +134,29 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
                                 >
                                     Save
                                 </button>
-                            </div>
-                        )}
 
-                        
+                                {isAdmin(token) && (
+                                    <button
+                                        onClick={() => navigate(`/saved/${id}/edit`)}
+                                        className="px-3 py-2 rounded-md border"
+                                    >
+                                        Edit
+                                    </button>
+                                )}
+
+                                {isAdmin(token) && (
+                                    <button
+                                        onClick={handleDelete}
+                                        className="bg-red-500 text-white px-3 py-2 rounded-md border"
+                                    >
+                                        Delete
+                                    </button>
+                                )}
+
+                                
+                            </div>
+                            
+                        )}
                     </div>
                 </div>
 
@@ -199,7 +219,7 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
                                 <span>Ingredients - </span>
                                 <span className="text-xl bg-[#f3f3f3] rounded-lg px-2">{data.ingredients.length}</span>
                             </h3>
-                            
+
                             <div className="bg-[#eeeeee] rounded-lg p-6">
                                 <ul className="space-y-3">
                                     {scaledIngredients?.map((ingredient, index) => (

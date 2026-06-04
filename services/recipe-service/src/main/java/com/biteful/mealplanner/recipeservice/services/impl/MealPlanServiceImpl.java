@@ -214,27 +214,44 @@ public class MealPlanServiceImpl implements MealPlanService {
         }
 
         Set<Recipe> used = new HashSet<>();
-        int span = 1;
-        if (preferences.getCookingTimesPerPlan() != 5) {
-            span = preferences.getDays() / preferences.getCookingTimesPerPlan();
-        }
-        for (int i = 0; i < preferences.getCookingTimesPerPlan(); i++) {
 
-            // Get a recipe that will be used for floor(preferences.getDays() / preferences.getCookingTimesPerPlan()) days.
-            Recipe recipe;
-            int attempts = 5;
-            if (desiredCalories == 0) {
-                recipe = pick(allRecipes, used);
-            } else {
-                List<Recipe> top = allRecipes.stream().limit(5).toList();
-                recipe = pick(top, used);
-            }
-            used.add(recipe);
+        if (preferences.getCookingTimesPerPlan() == 5) {
 
-            // Add the recipe to the plan
-            for (int j = i + i * span; j <= Math.min(i + (i + 1) * span, preferences.getDays() - 1); j++) {
-                LocalDate date = preferences.getStartDate().plusDays(j);
+            for (int i = 0; i < preferences.getDays(); i++) {
+                // Get a recipe that will be used for floor(preferences.getDays() / preferences.getCookingTimesPerPlan()) days.
+                Recipe recipe;
+                if (desiredCalories == 0) {
+                    recipe = pick(allRecipes, used);
+                } else {
+                    List<Recipe> top = allRecipes.stream().limit(5).toList();
+                    recipe = pick(top, used);
+                }
+                used.add(recipe);
+
+                LocalDate date = preferences.getStartDate().plusDays(i);
                 addMealToList(meals, recipe, type, date);
+            }
+
+        } else {
+            int span = preferences.getDays() / preferences.getCookingTimesPerPlan();
+
+            for (int i = 0; i < preferences.getCookingTimesPerPlan(); i++) {
+
+                // Get a recipe that will be used for floor(preferences.getDays() / preferences.getCookingTimesPerPlan()) days.
+                Recipe recipe;
+                if (desiredCalories == 0) {
+                    recipe = pick(allRecipes, used);
+                } else {
+                    List<Recipe> top = allRecipes.stream().limit(5).toList();
+                    recipe = pick(top, used);
+                }
+                used.add(recipe);
+
+                // Add the recipe to the plan
+                for (int j = i + i * span; j <= Math.min(i + (i + 1) * span, preferences.getDays() - 1); j++) {
+                    LocalDate date = preferences.getStartDate().plusDays(j);
+                    addMealToList(meals, recipe, type, date);
+                }
             }
         }
     }

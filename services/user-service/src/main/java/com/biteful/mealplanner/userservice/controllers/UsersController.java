@@ -2,6 +2,7 @@ package com.biteful.mealplanner.userservice.controllers;
 
 import com.biteful.mealplanner.userservice.config.security.UserPrincipal;
 import com.biteful.mealplanner.userservice.domain.dto.AdminUsersDto;
+import com.biteful.mealplanner.userservice.domain.dto.RoleRequest;
 import com.biteful.mealplanner.userservice.domain.dto.UserDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
 import com.biteful.mealplanner.userservice.mappers.impl.AdminUserMapper;
@@ -13,10 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -66,4 +64,14 @@ public class UsersController {
 
         return adminUserMapper.mapTo(userEntity);
     }
+
+    @PatchMapping("/api/users/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void changeUserRole(
+            @PathVariable UUID id,
+            @RequestBody RoleRequest request
+            ) {
+        userService.changeRole(id, request.getRole());
+    }
+
 }

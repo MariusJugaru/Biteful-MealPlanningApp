@@ -12,6 +12,7 @@ import PublicRoute from "./PublicRoute";
 import Logout from "./Pages/Logout";
 import Lists from "./Pages/Lists";
 import SavedLists from "./Pages/SavedLists"
+import Users from "./Pages/Users";
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -35,6 +36,7 @@ function App() {
         <Route path="/meals/:id" element={<ProtectedRoute><SavedRecipe mode="home" /></ProtectedRoute>} />
         <Route path="/lists" element={<ProtectedRoute><Lists /></ProtectedRoute>} />
         <Route path="/lists/:listId" element={<ProtectedRoute><SavedLists /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
 
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

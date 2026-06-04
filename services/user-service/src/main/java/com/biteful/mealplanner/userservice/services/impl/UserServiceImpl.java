@@ -2,6 +2,7 @@ package com.biteful.mealplanner.userservice.services.impl;
 
 import com.biteful.mealplanner.userservice.domain.dto.UpdatePasswordRequestDto;
 import com.biteful.mealplanner.userservice.domain.entities.UserEntity;
+import com.biteful.mealplanner.userservice.domain.entities.UserRole;
 import com.biteful.mealplanner.userservice.exceptions.runtime.EmailAlreadyExistsException;
 import com.biteful.mealplanner.userservice.exceptions.runtime.InvalidPasswordException;
 import com.biteful.mealplanner.userservice.exceptions.runtime.UserNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +76,21 @@ public class UserServiceImpl implements UserService {
     public Page<UserEntity> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
+
+    @Override
+    public void changeRole(UUID userId, UserRole role) {
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setUserRole(role);
+        userRepository.save(user);
+    }
+
 
     @Override
     public void deleteUser(UUID id) {
