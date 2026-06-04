@@ -212,7 +212,7 @@ public class RecipeControllerTests {
         Recipe saved = recipeService.createRecipe(recipeA, user.getId(), user.getRole());
 
         MvcResult result = mockMvc.perform(
-                        MockMvcRequestBuilders.delete(String.format("/api/recipes/me/%s", saved.getId()))
+                        MockMvcRequestBuilders.delete(String.format("/api/recipes/%s", saved.getId()))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
