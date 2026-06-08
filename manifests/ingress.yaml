@@ -45,3 +45,27 @@ spec:
                 name: recipe-service
                 port:
                   number: 80
+
+          - path: /api/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: recipe-service
+                port:
+                  number: 80
+
+          - path: /api/plans
+            pathType: Prefix
+            backend:
+              service:
+                name: recipe-service
+                port:
+                  number: 80
+
+          - path: /api/lists
+            pathType: Prefix
+            backend:
+              service:
+                name: list-service
+                port:
+                  number: 80
