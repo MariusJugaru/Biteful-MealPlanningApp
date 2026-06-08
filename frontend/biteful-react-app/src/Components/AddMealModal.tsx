@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
 import RecipeCard from "./RecipeCard";
@@ -37,27 +36,27 @@ function getDayName(dateString: string) {
 
 function AddMealModal({ open, onClose, type, date, onSelectRecipe } : AddMealProps) {
 
-    const [selectedCategory, setSelectedCategory] = useState<string>(type);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [isMobile, setIsMobile] = useState(false);
+    // const [selectedCategory, setSelectedCategory] = useState<string>(type);
+    // const [searchQuery, setSearchQuery] = useState("");
+    // const [isMobile, setIsMobile] = useState(false);
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
+    // useEffect(() => {
+    //     const checkMobile = () => {
+    //         setIsMobile(window.innerWidth < 768);
+    //     };
 
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
+    //     checkMobile();
+    //     window.addEventListener("resize", checkMobile);
 
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
+    //     return () => window.removeEventListener("resize", checkMobile);
+    // }, []);
 
-    useEffect(() => {
-        if (open) {
-            setSelectedCategory(type);
-            setSearchQuery("");
-        }
-    }, [open, type]);
+    // useEffect(() => {
+    //     if (open) {
+    //         setSelectedCategory(type);
+    //         setSearchQuery("");
+    //     }
+    // }, [open, type]);
 
     const token = localStorage.getItem("token");
     const { data, loading, error } = useFetch<ApiResponse>(

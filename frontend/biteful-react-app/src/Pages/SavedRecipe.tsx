@@ -21,11 +21,6 @@ function SavedRecipe({ mode = "saved" } : {mode?: "saved" | "public" | "home"}) 
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const api =
-        mode === "saved"
-            ? "/api/recipes/me/"
-            : "/api/recipes/"
-
     const token = localStorage.getItem("token");
     const { data, loading, error } = useFetch<Recipe>(
         `${config.apiUrl}/api/recipes/${id}`,

@@ -35,8 +35,11 @@ spec:
             - name: JWT_SECRET
               value: mySuperSecretKeyThatIsLongEnough12345
 
-            - name: API_URL
+            - name: CORS_ALLOWED_ORIGIN
               value: https://biteful.xyz
+
+            - name: API_URL
+              value: https://api.biteful.xyz
 
           resources:
             requests:

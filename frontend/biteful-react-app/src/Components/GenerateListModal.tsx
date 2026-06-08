@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import useFetch from "../Hooks/useFetch";
-import { config } from "../config";
-import RecipeCard from "./RecipeCard";
 import { DateRange } from "react-date-range";
 
 
@@ -25,8 +22,6 @@ function GenerateListModal({ open, onClose, onAddList } : AddListProps) {
 
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
-
-    const token = localStorage.getItem("token");
 
     const [title, setTitle] = useState("");
 

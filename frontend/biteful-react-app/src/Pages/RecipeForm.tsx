@@ -10,11 +10,14 @@ import InfoCard from "../Components/InfoCard";
 import TagComponent from "../Components/TagComponent";
 import { config } from "../config";
 import { useLocation } from "react-router-dom";
+import { useRef } from "react";
 
 function RecipeForm({ mode }: { mode: "create" | "edit"}) {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const nameInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const [recipe, setRecipe] = useState<Recipe>({
         title: "",
@@ -99,10 +102,14 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
         });
     };
 
-    const addIngredient = () => {
+    const addIngredient = (index: number) => {
         setRecipe({
             ...recipe,
             ingredients: [...recipe.ingredients, { name: "", quantity: 0, unit: "" }],
+        });
+
+        requestAnimationFrame(() => {
+            nameInputRefs.current[index + 1]?.focus();
         });
     };
 
@@ -360,7 +367,7 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                                     <span className="text-xl bg-[#f3f3f3] rounded-lg px-2">{recipe.ingredients.length}</span>
                                 </div>
                                 
-                                <button onClick={addIngredient}>
+                                <button onClick={() => {addIngredient(recipe.ingredients.length - 1)}}>
                                     <Plus />
                                 </button>
                             </h3>
@@ -369,10 +376,17 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                                 {recipe.ingredients.map((ing, i) => (
                                 <div key={i} className="flex gap-2 items-center">
                                     <input
+                                        ref={(el) => {
+                                            nameInputRefs.current[i] = el;
+                                        }}
                                         value={ing.name}
                                         onChange={(e) =>
                                             updateIngredient(i, "name", e.target.value)
                                         }
+                                        onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            addIngredient(i)
+                                        }}}
                                         placeholder="Name"
                                         className="flex-1 rounded-lg p-2"
                                     />
@@ -383,6 +397,10 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                                         onChange={(e) =>
                                             updateIngredient(i, "quantity", Number(e.target.value))
                                         }
+                                        onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            addIngredient(i)
+                                        }}}
                                         placeholder="quantity"
                                         className="w-40 rounded-lg p-2"
                                     />
@@ -392,6 +410,10 @@ function RecipeForm({ mode }: { mode: "create" | "edit"}) {
                                         onChange={(e) =>
                                             updateIngredient(i, "unit", e.target.value)
                                         }
+                                        onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            addIngredient(i)
+                                        }}}
                                         placeholder="unit"
                                         className="w-40 rounded-lg p-2"
                                     />

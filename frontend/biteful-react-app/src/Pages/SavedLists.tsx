@@ -1,12 +1,9 @@
 import Header from "../Components/Header";
-import RecipeCard from "../Components/RecipeCard";
 import NavButton from "../Components/NavButton";
 import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
-import { ArrowLeft, Check, ListPlus, Plus, Trash, Trash2, X } from "lucide-react";
-import AiRecipeModal from "../Components/AiRecipeModal";
+import { ArrowLeft, Check, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import AddListModal from "../Components/AddListModal";
 import { useNavigate, useParams } from "react-router-dom";
 
 
@@ -37,7 +34,6 @@ function savedList() {
     
     const {
         data: listData,
-        loading: loadingData,
         error: errorData
     } = useFetch<List>(
         `${config.apiUrl}/api/lists/${listId}`,

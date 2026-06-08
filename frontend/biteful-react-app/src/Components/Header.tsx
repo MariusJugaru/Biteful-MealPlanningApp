@@ -1,4 +1,4 @@
-import { UtensilsCrossed, Home, CookingPot, LucideScrollText, Bookmark, User2 } from "lucide-react";
+import { UtensilsCrossed, Home, CookingPot, LucideScrollText, Bookmark, User2, LogOutIcon } from "lucide-react";
 import NavButton from "./NavButton";
 import isAdmin from "../Helpers/IsAdmin";
 
@@ -41,6 +41,10 @@ function Header() {
                                 Users
                             </NavButton>
                         )}
+                        <NavButton to="/logout">
+                            <LogOutIcon className="w-5 h-5" />
+                            Logout
+                        </NavButton>
                         
                     </nav>
                 </div>

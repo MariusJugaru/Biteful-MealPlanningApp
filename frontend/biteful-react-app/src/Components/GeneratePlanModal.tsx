@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import useFetch from "../Hooks/useFetch";
 import { config } from "../config";
-import RecipeCard from "./RecipeCard";
 
 import { DateRange } from "react-date-range";
 import { BookOpen, ChefHat, Cookie, Salad, Save, Target } from "lucide-react";

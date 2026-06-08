@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import useFetch from "../Hooks/useFetch";
-import { config } from "../config";
-import RecipeCard from "./RecipeCard";
-
+import { useState } from "react";
 
 type AddListProps = {
     open: boolean;
@@ -12,20 +8,18 @@ type AddListProps = {
 
 
 function AddListModal({ open, onClose, onAddList } : AddListProps) {
-    const [isMobile, setIsMobile] = useState(false);
+    // const [isMobile, setIsMobile] = useState(false);
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
+    // useEffect(() => {
+    //     const checkMobile = () => {
+    //         setIsMobile(window.innerWidth < 768);
+    //     };
 
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
+    //     checkMobile();
+    //     window.addEventListener("resize", checkMobile);
 
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
-
-    const token = localStorage.getItem("token");
+    //     return () => window.removeEventListener("resize", checkMobile);
+    // }, []);
 
     const [title, setTitle] = useState("");
 

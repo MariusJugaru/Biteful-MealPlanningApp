@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 
 import Header from "../Components/Header";
 import StatsSection from "../Components/StatsSection";
@@ -9,8 +8,6 @@ import AddMealModal from "../Components/AddMealModal";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import GeneratePlanModal from "../Components/GeneratePlanModal";
 import type { MealResponse } from "../types/mealsResponse";
-
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 function getWeekBounds(baseDate: Date) {
 
@@ -219,9 +216,7 @@ function Home() {
         );
     }
 
-    async function saveGeneratedPlan(
-        generatedPlan: MealResponse[],
-    ) {
+    async function saveGeneratedPlan() {
         console.log(JSON.stringify(generatedMeals))
 
         const response = await fetch(
@@ -309,7 +304,7 @@ function Home() {
                         {/* Save Generated Plan Button */}
                         {generatedMeals.length > 0 && (
                             <button
-                                onClick={() => saveGeneratedPlan(generatedMeals)}
+                                onClick={() => saveGeneratedPlan()}
                                 className="flex items-center gap-2 bg-green-400 text-white px-3 py-2 rounded-md text-sm font-medium"
                             >
                                 Save
